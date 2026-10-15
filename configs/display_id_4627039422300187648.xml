@@ -110,23 +110,23 @@
         <thermalStatusLimit>critical</thermalStatusLimit>
         <!-- Low power mode limitation for HBM -->
         <allowInLowPowerMode>true</allowInLowPowerMode>
-        <!-- HDR headroom (tester's curve): up to 2x from 10 to 200 SDR nits, back to 1x by 500
-             nits, so HDR never leaves the normal range. Without a ratio map the framework has no
-             HDR brightness and HDR video is tone-mapped down to SDR white. Stock's 8x
-             (/product/etc/displayconfig) is not used: the backlight goes through the lights HAL
-             here, not the composer, so the boost raises the whole screen, and 8x would drive it
-             to sunlight/peak brightness (heat, battery, HBM budget). For the same reason HDR
-             must cover half the screen (framework default; stock 0), so thumbnails don't boost. -->
-        <minimumHdrPercentOfScreen>0.5</minimumHdrPercentOfScreen>
+        <!-- HDR headroom (tester's calibrated curve): 8x at the lowest SDR brightness down
+             to 2x from 500 nits, capped by the 1200 nit maximum. Without a ratio map the
+             framework has no HDR brightness and HDR video is tone-mapped down to SDR white.
+             The backlight goes through the lights HAL here, not the composer, so SurfaceFlinger
+             cannot dim SDR content: while HDR is on screen the whole screen, UI included, is
+             raised. With minimumHdrPercentOfScreen 0 (as stock) any visible HDR layer, a
+             thumbnail too, triggers it. Light.cpp keeps the level below the panel's peak mode. -->
+        <minimumHdrPercentOfScreen>0</minimumHdrPercentOfScreen>
         <sdrHdrRatioMap>
-            <point><sdrNits>2.0</sdrNits><hdrRatio>1.0</hdrRatio></point>
-            <point><sdrNits>10.0</sdrNits><hdrRatio>2.0</hdrRatio></point>
-            <point><sdrNits>50.0</sdrNits><hdrRatio>2.0</hdrRatio></point>
-            <point><sdrNits>100.0</sdrNits><hdrRatio>2.0</hdrRatio></point>
-            <point><sdrNits>200.0</sdrNits><hdrRatio>2.0</hdrRatio></point>
-            <point><sdrNits>300.0</sdrNits><hdrRatio>1.4</hdrRatio></point>
-            <point><sdrNits>500.0</sdrNits><hdrRatio>1.0</hdrRatio></point>
-            <point><sdrNits>1201.0</sdrNits><hdrRatio>1.0</hdrRatio></point>
+            <point><sdrNits>2.0</sdrNits><hdrRatio>8.0</hdrRatio></point>
+            <point><sdrNits>10.0</sdrNits><hdrRatio>7.0</hdrRatio></point>
+            <point><sdrNits>50.0</sdrNits><hdrRatio>6.0</hdrRatio></point>
+            <point><sdrNits>100.0</sdrNits><hdrRatio>5.0</hdrRatio></point>
+            <point><sdrNits>200.0</sdrNits><hdrRatio>4.0</hdrRatio></point>
+            <point><sdrNits>300.0</sdrNits><hdrRatio>3.0</hdrRatio></point>
+            <point><sdrNits>500.0</sdrNits><hdrRatio>2.0</hdrRatio></point>
+            <point><sdrNits>1200.0</sdrNits><hdrRatio>2.0</hdrRatio></point>
         </sdrHdrRatioMap>
     </highBrightnessMode>
 </displayConfiguration>

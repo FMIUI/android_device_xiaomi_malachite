@@ -135,14 +135,28 @@ class DeviceContracts(unittest.TestCase):
         # 0x10d, expert wide colour, shows only a faint red without Xiaomi's display service.
         self.assertNotIn("269", modes)
 
-    def test_hdr_has_headroom_for_full_screen_hdr_only(self):
+    def test_hdr_headroom_is_the_calibrated_curve(self):
         hbm = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot().find(
             "highBrightnessMode")
-        self.assertEqual(hbm.find("minimumHdrPercentOfScreen").text, "0.5")
-        ratios = [float(p.find("hdrRatio").text) for p in hbm.find("sdrHdrRatioMap").iter("point")]
-        # The whole screen is boosted here, so stay within the normal range (<= 500 nits).
-        self.assertLessEqual(max(ratios), 2.0)
-        self.assertEqual(ratios[-1], 1.0)
+        # As stock: any visible HDR layer gets headroom.
+        self.assertEqual(hbm.find("minimumHdrPercentOfScreen").text, "0")
+        points = [(float(p.find("sdrNits").text), float(p.find("hdrRatio").text))
+                  for p in hbm.find("sdrHdrRatioMap").iter("point")]
+        nits = [n for n, _ in points]
+        ratios = [r for _, r in points]
+        self.assertEqual(nits, sorted(nits))
+        # Most headroom at the lowest brightness, never below SDR, never above stock's 8x.
+        self.assertEqual(ratios, sorted(ratios, reverse=True))
+        self.assertLessEqual(max(ratios), 8.0)
+        self.assertGreaterEqual(min(ratios), 1.0)
+
+    def test_backlight_never_enters_panel_peak_mode(self):
+        # HDR headroom and 100 % brightness reach the top of the range. Level 4095 turns on
+        # the panel's peak mode, whose driver path deadlocks the display (prebuilt modules).
+        light = (ROOT / "lights/Light.cpp").read_text()
+        self.assertIn("#define PANEL_LEVEL_SAFE_MAX 4094", light)
+        self.assertIn("std::min<uint32_t>(getScaledBrightness(state), PANEL_LEVEL_SAFE_MAX)",
+                      light)
 
     def test_headset_detection_uses_input_events(self):
         config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")

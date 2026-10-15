@@ -257,11 +257,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     ANGLE
 
-# Refresh rate: keep SurfaceFlinger off the panel's 30 Hz AOD mode by default
-# (refreshrate/), see Settings > Display > Minimum refresh rate.
-PRODUCT_PACKAGES += \
-    MalachiteRefreshRate
-
 PRODUCT_SYSTEM_EXT_PROPERTIES += \
     sys.brightness.disable_gamma_conversion=true
 

@@ -546,6 +546,20 @@
          non-zero. -->
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
+    <!-- Low-brightness flicker zone. Each rate switch can show as a flicker on this panel, and
+         it is most visible when the screen is dim. Stock never drops to 60 Hz at or below
+         brightness 1580 of 20479 (ro.vendor.disable_idle_fps.threshold in
+         libmisurfaceflinger, about 75 nits). At or below brightness 29 (of 255, about 101 nits
+         with our map) the rate stays at 120 Hz, or the user's maximum, and doesn't switch.
+         No ambient light condition (-1), so the light sensor isn't needed for it. -->
+    <integer-array translatable="false" name="config_brightnessThresholdsOfPeakRefreshRate">
+        <item>29</item>
+    </integer-array>
+    <integer-array translatable="false" name="config_ambientThresholdsOfPeakRefreshRate">
+        <item>-1</item>
+    </integer-array>
+    <integer name="config_defaultRefreshRateInZone">120</integer>
+
     <!-- The type of the light sensor to be used by the display framework for things like
          auto-brightness. If unset, then it just gets the default sensor of type TYPE_LIGHT. -->
     <string name="config_displayLightSensorType">android.sensor.light</string>

@@ -158,6 +158,28 @@ class DeviceContracts(unittest.TestCase):
         self.assertIn("std::min<uint32_t>(getScaledBrightness(state), PANEL_LEVEL_SAFE_MAX)",
                       light)
 
+    def test_low_brightness_keeps_one_refresh_rate(self):
+        overlay = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
+        root = overlay.getroot()
+        arrays = {node.get("name"): [int(item.text) for item in node.iter("item")]
+                  for node in root.iter("integer-array")}
+        integers = {node.get("name"): node.text for node in root.iter("integer")}
+        self.assertEqual(arrays["config_brightnessThresholdsOfPeakRefreshRate"], [29])
+        # Negative: no ambient light condition.
+        self.assertEqual(arrays["config_ambientThresholdsOfPeakRefreshRate"], [-1])
+        self.assertEqual(integers["config_defaultRefreshRateInZone"], "120")
+        props = (ROOT / "vendor.prop").read_text()
+        self.assertIn("ro.surface_flinger.set_idle_timer_ms=1100\n", props)
+        self.assertIn("ro.surface_flinger.use_content_detection_for_refresh_rate=false\n", props)
+        # The panel drivers offer nothing below 60 Hz; no minimum refresh rate writer.
+        self.assertNotIn("MalachiteRefreshRate", (ROOT / "device.mk").read_text())
+        self.assertFalse((ROOT / "refreshrate").exists())
+        settings = ET.parse(ROOT / "overlay/SettingsResOverlayMalachite/res/values/"
+                            "lineage_config.xml").getroot()
+        bools = {node.get("name"): node.text for node in settings.iter("bool")}
+        self.assertEqual(bools["config_show_min_refresh_rate_switch"], "true")
+        self.assertEqual(bools["config_show_peak_refresh_rate_switch"], "true")
+
     def test_headset_detection_uses_input_events(self):
         config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
         bools = {node.get("name"): node.text for node in config.getroot().iter("bool")}

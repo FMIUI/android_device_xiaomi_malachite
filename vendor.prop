@@ -357,6 +357,10 @@ telephony.lteOnCdmaDevice=1
 # Seamless transfer
 sys.fflag.override.settings_seamless_transfer=true
 
+# Backlight through MediaTek's composer, as stock: SurfaceFlinger can then dim SDR
+# content while HDR content gets headroom. Scale: init.mt6878.rc, logic_max_brightness.
+ro.vendor.mtk_backlight_hwc_support=1
+
 # Surface Flinger
 debug.sf.auto_latch_unsignaled=1
 debug.sf.disable_client_composition_cache=0

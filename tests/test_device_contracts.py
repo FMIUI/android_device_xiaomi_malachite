@@ -158,6 +158,22 @@ class DeviceContracts(unittest.TestCase):
         self.assertIn("std::min<uint32_t>(getScaledBrightness(state), PANEL_LEVEL_SAFE_MAX)",
                       light)
 
+    def test_composer_backlight_scale_stays_below_peak_mode(self):
+        # leds-mtk (prebuilt) passes (max_hw * value + logic_max / 2) / logic_max to the panel;
+        # the composer writes min_hw + (max_hw - min_hw) * brightness with max_hw 20479.
+        props = (ROOT / "vendor.prop").read_text()
+        self.assertRegex(props, r"(?m)^ro\.vendor\.mtk_backlight_hwc_support=1$")
+        rc = (ROOT / "init/init.mt6878.rc").read_text()
+        match = re.search(r"write /sys/class/leds/lcd-backlight/logic_max_brightness (\d+)", rc)
+        self.assertIsNotNone(match)
+        logic_max, max_hw = int(match.group(1)), 20479
+
+        def panel(value):
+            return (max_hw * value + logic_max // 2) // logic_max
+
+        self.assertEqual(panel(max_hw), 4094)        # full brightness, 4095 is peak mode
+        self.assertEqual(panel(max_hw // 2), 2047)   # 0.5, the 500 nit normal maximum
+
     def test_headset_detection_uses_input_events(self):
         config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
         bools = {node.get("name"): node.text for node in config.getroot().iter("bool")}

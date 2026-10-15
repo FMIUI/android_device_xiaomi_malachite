@@ -51,7 +51,9 @@
          -2 is invalid so setting will resort to int value specified above.
          Set this to 0.0 to allow screen to go to minimal brightness.
          The user is forbidden from setting the brightness below this level. -->
-    <item name="config_screenBrightnessSettingMinimumFloat" format="float" type="dimen">0.000683661</item>
+    <!-- 0.00352 is the lowest level the composer turns into panel level 15, the release
+         minimum the lights HAL kept (composer level 1 + 20478 * f, divided by about 5). -->
+    <item name="config_screenBrightnessSettingMinimumFloat" format="float" type="dimen">0.00352</item>
 
     <!-- Maximum screen brightness allowed by the power manager.
          -2 is invalid so setting will resort to int value specified above.
@@ -87,7 +89,7 @@
     <!-- Screen brightness used to dim the screen when the user activity
          timeout expires.  May be less than the minimum allowed brightness setting
          that can be set by the user. -->
-    <item name="config_screenBrightnessDimFloat" format="float" type="dimen">0.000683661</item>
+    <item name="config_screenBrightnessDimFloat" format="float" type="dimen">0.00352</item>
 
     <!-- Array of light sensor lux values to define our levels for auto backlight brightness support.
          The N entries of this array define N + 1 control points as follows:

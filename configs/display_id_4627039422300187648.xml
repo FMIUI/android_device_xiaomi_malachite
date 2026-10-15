@@ -113,10 +113,11 @@
         <!-- HDR headroom (tester's calibrated curve): 8x at the lowest SDR brightness down
              to 2x from 500 nits, capped by the 1200 nit maximum. Without a ratio map the
              framework has no HDR brightness and HDR video is tone-mapped down to SDR white.
-             The backlight goes through the lights HAL here, not the composer, so SurfaceFlinger
-             cannot dim SDR content: while HDR is on screen the whole screen, UI included, is
-             raised. With minimumHdrPercentOfScreen 0 (as stock) any visible HDR layer, a
-             thumbnail too, triggers it. Light.cpp keeps the level below the panel's peak mode. -->
+             The backlight goes through MediaTek's composer (ro.vendor.mtk_backlight_hwc_support),
+             so SurfaceFlinger dims SDR content while HDR content is shown brighter, as stock.
+             With minimumHdrPercentOfScreen 0 (as stock) any visible HDR layer, a thumbnail too,
+             gets headroom. logic_max_brightness (init.mt6878.rc) keeps the level below the
+             panel's peak mode. -->
         <minimumHdrPercentOfScreen>0</minimumHdrPercentOfScreen>
         <sdrHdrRatioMap>
             <point><sdrNits>2.0</sdrNits><hdrRatio>8.0</hdrRatio></point>

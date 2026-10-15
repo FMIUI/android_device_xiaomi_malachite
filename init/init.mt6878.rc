@@ -713,6 +713,14 @@ on early-boot
     chown system system /sys/class/leds/lcd-backlight/led_type
     chmod 0644 /sys/class/leds/lcd-backlight/logic_max_brightness
     chown system system /sys/class/leds/lcd-backlight/logic_max_brightness
+    # MediaTek's composer sets the backlight (ro.vendor.mtk_backlight_hwc_support)
+    # as min_hw + (max_hw_brightness - min_hw) * brightness, on Xiaomi's 0-20479 scale
+    # (5 per panel level), and writes it to this LED. leds-mtk passes
+    # max_hw_brightness * value / logic_max_brightness to the panel, which takes 0-4095,
+    # and both maxima are 20479 by default. 102430 divides by 5: full brightness is
+    # panel level 4094 (4095 would turn on peak mode, whose driver path deadlocks the
+    # display), the 500 nit normal maximum 2047. The composer only ever raises this.
+    write /sys/class/leds/lcd-backlight/logic_max_brightness 102430
 
     chmod 0664 /sys/class/leds/lcd-backlight1/brightness
     chown system system /sys/class/leds/lcd-backlight1/brightness

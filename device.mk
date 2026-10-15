@@ -347,6 +347,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.media.c2-mtk-service
 
+# Media (Dolby): stock's Dolby Codec2 stores over AIDL, with the shims their
+# decoders need on this platform.
+PRODUCT_PACKAGES += \
+    android.hardware.media.c2-dolby-service \
+    libcodec2_hidl_shim \
+    libcodec2_shim
+
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/configs/media,$(TARGET_COPY_OUT_VENDOR)/etc)
 

@@ -28,3 +28,11 @@ cc_binary {
     // The store libraries (c2.dolby.store, libcodec2_store_dolby) and their
     // decoders come from vendor/xiaomi/malachite and are loaded with dlopen.
 }
+
+// Old name of objcpy() for stock's Dolby Vision client, see objcpy_shim.cpp.
+cc_library_shared {
+    name: "libcodec2_hidl_shim",
+    vendor: true,
+    defaults: ["libcodec2-hidl-defaults"],
+    srcs: ["objcpy_shim.cpp"],
+}

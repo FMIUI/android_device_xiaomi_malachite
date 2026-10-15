@@ -225,5 +225,15 @@ class DolbyCodecTests(unittest.TestCase):
         self.assertIn("c2.mtk.hevc.decoder.secure", decoders)
 
 
+    def test_display_reports_dolby_vision(self):
+        # MediaTek's composer does not list Dolby Vision; SurfaceFlinger adds it
+        # from this property, which needs a context it can read.
+        props = (ROOT / "vendor.prop").read_text()
+        self.assertRegex(props, r"(?m)^ro\.surface_flinger\.has_dolby_vision=true$")
+        contexts = (ROOT / "sepolicy/private/property_contexts").read_text()
+        self.assertRegex(contexts, r"(?m)^ro\.surface_flinger\.has_dolby_vision\s+"
+                                   r"u:object_r:surfaceflinger_prop:s0 exact bool$")
+
+
 if __name__ == "__main__":
     unittest.main()

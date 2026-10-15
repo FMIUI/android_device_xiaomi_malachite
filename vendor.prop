@@ -357,6 +357,12 @@ telephony.lteOnCdmaDevice=1
 # Seamless transfer
 sys.fflag.override.settings_seamless_transfer=true
 
+# Backlight through MediaTek's composer, as stock: SurfaceFlinger then gets the SDR and the
+# display level separately and dims SDR content while HDR content is shown brighter. The
+# composer writes 1 + 20478 * the framework's backlight float to lcd-backlight, which the
+# panel takes as its level; configs/display_id_*.xml maps those levels to stock's nits.
+ro.vendor.mtk_backlight_hwc_support=1
+
 # Surface Flinger
 debug.sf.auto_latch_unsignaled=1
 debug.sf.disable_client_composition_cache=0

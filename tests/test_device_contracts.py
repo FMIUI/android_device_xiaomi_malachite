@@ -99,11 +99,11 @@ class DeviceContracts(unittest.TestCase):
         for level in range(2, 256):
             with self.subTest(level=level):
                 self.assertLessEqual(abs(table[level] - 4095 * (level - 1) / 254), 1)
-        # Float 0.5, the high-brightness transition point, is the normal maximum.
+        # Float 0.5 is the normal maximum on the lights HAL path (no longer the backlight
+        # path, see test_composer_backlight_levels_are_panel_levels).
         self.assertEqual(table[128], 2047)
         self.assertGreater(table[129], 2047)
         display = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
-        self.assertEqual(display.find("highBrightnessMode/transitionPoint").text, "0.499951")
         # Zero HBM time makes the controller reschedule itself continuously in sunlight.
         timing = display.find("highBrightnessMode/timing")
         self.assertGreater(int(timing.find("timeMaxSecs").text), 0)
@@ -157,6 +157,49 @@ class DeviceContracts(unittest.TestCase):
         self.assertIn("#define PANEL_LEVEL_SAFE_MAX 4094", light)
         self.assertIn("std::min<uint32_t>(getScaledBrightness(state), PANEL_LEVEL_SAFE_MAX)",
                       light)
+
+    def test_composer_backlight_levels_are_panel_levels(self):
+        # MediaTek's composer writes level = int(1 + 20478 * value + 0.5) to lcd-backlight
+        # (min_brightness 1, max_brightness 20479), and the panel takes it as is.
+        props = (ROOT / "vendor.prop").read_text()
+        self.assertRegex(props, r"(?m)^ro\.vendor\.mtk_backlight_hwc_support=1$")
+        display = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
+        points = [(float(p.find("value").text), float(p.find("nits").text))
+                  for p in display.find("screenBrightnessMap").iter("point")]
+        levels = [int(1 + 20478 * value + 0.5) for value, _ in points]
+        nits = [n for _, n in points]
+        for (value, _), level in zip(points, levels):
+            with self.subTest(value=value):
+                # Each point is exactly a panel level, not between two.
+                self.assertAlmostEqual(1 + 20478 * value, level, delta=0.01)
+        self.assertEqual(levels, sorted(set(levels)))
+        self.assertEqual(nits, sorted(nits))
+        # Level 15 is the minimum; 4095 would turn on the panel's peak mode, whose driver
+        # path deadlocks the display.
+        self.assertEqual(levels[0], 15)
+        self.assertEqual(levels[-1], 4094)
+        self.assertAlmostEqual(nits[-1], 1200, delta=1)
+        overlay = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
+        dimens = {node.get("name"): float(node.text)
+                  for node in overlay.getroot().iter("item") if node.get("type") == "dimen"}
+        self.assertEqual(dimens["config_screenBrightnessSettingMinimumFloat"], points[0][0])
+        self.assertEqual(dimens["config_screenBrightnessSettingMaximumFloat"], points[-1][0])
+        self.assertEqual(dimens["config_screenBrightnessDimFloat"], points[0][0])
+
+        def brightness_at(target):
+            # Brightness is the backlight range rescaled to 0..1 (DisplayDeviceConfig).
+            for (v0, n0), (v1, n1) in zip(points, points[1:]):
+                if n0 <= target <= n1:
+                    value = v0 + (v1 - v0) * (target - n0) / (n1 - n0)
+                    return (value - points[0][0]) / (points[-1][0] - points[0][0])
+            raise AssertionError(target)
+
+        # Sunlight brightness starts at 500 nits, as stock.
+        transition = float(display.find("highBrightnessMode/transitionPoint").text)
+        self.assertAlmostEqual(transition, brightness_at(500), delta=0.002)
+        # The default stays at about 75 nits.
+        self.assertAlmostEqual(dimens["config_screenBrightnessSettingDefaultFloat"],
+                               brightness_at(75), delta=0.002)
 
     def test_low_brightness_keeps_one_refresh_rate(self):
         overlay = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")

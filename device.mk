@@ -288,6 +288,10 @@ PRODUCT_PACKAGES += \
     android.hardware.health-service.example \
     android.hardware.health-service.example_recovery
 
+# Off-mode charging: backlight after each wake of the charging screen (charger/)
+PRODUCT_PACKAGES += \
+    vendor.charger_backlight.malachite
+
 # HotwordEnrollement
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml

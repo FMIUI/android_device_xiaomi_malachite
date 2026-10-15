@@ -6,4 +6,10 @@
 <resources>
     <!-- Show battery cycle count -->
     <bool name="config_show_battery_cycle_count" translatable="false">true</bool>
+
+    <!-- Settings > Display > Minimum refresh rate: 120 Hz keeps the panel from
+         switching modes at all. -->
+    <bool name="config_show_min_refresh_rate_switch" translatable="false">true</bool>
+    <!-- The 30 Hz mode is the panel's AOD mode; it flickers as a screen mode. -->
+    <integer name="config_min_refresh_rate_lowest" translatable="false">60</integer>
 </resources>

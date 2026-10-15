@@ -1,0 +1,14 @@
+//
+// SPDX-FileCopyrightText: 2026 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+// Gives each user a minimum refresh rate of 60 Hz until they pick one in
+// Settings > Display > Minimum refresh rate.
+android_app {
+    name: "MalachiteRefreshRate",
+    srcs: ["src/**/*.java"],
+    certificate: "platform",
+    system_ext_specific: true,
+    platform_apis: true,
+}

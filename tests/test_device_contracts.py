@@ -207,7 +207,7 @@ class DeviceContracts(unittest.TestCase):
         arrays = {node.get("name"): [int(item.text) for item in node.iter("item")]
                   for node in root.iter("integer-array")}
         integers = {node.get("name"): node.text for node in root.iter("integer")}
-        self.assertEqual(arrays["config_brightnessThresholdsOfPeakRefreshRate"], [29])
+        self.assertEqual(arrays["config_brightnessThresholdsOfPeakRefreshRate"], [22])
         # Negative: no ambient light condition.
         self.assertEqual(arrays["config_ambientThresholdsOfPeakRefreshRate"], [-1])
         self.assertEqual(integers["config_defaultRefreshRateInZone"], "120")

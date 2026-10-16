@@ -551,13 +551,15 @@
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
     <!-- Low-brightness flicker zone. Each rate switch can show as a flicker on this panel, and
-         it is most visible when the screen is dim. Stock never drops to 60 Hz at or below
-         brightness 1580 of 20479 (ro.vendor.disable_idle_fps.threshold in
-         libmisurfaceflinger, about 75 nits). At or below brightness 29 (of 255, about 101 nits
-         with our map) the rate stays at 120 Hz, or the user's maximum, and doesn't switch.
+         it is most visible when the screen is dim. Stock skips the idle drop to 60 Hz at or
+         below brightness 1580 of 20479 (ro.vendor.disable_idle_fps.threshold in
+         libmisurfaceflinger, about 75 nits). Here, at or below brightness 22 (of 255, about
+         80 nits with our map), the framework holds the current rate (120 Hz, or the user's
+         maximum) instead of letting the idle timer switch it. Its 120 Hz vote has the lowest
+         priority, so a rate an app asks for (a 60 fps video) still applies, as on stock.
          No ambient light condition (-1), so the light sensor isn't needed for it. -->
     <integer-array translatable="false" name="config_brightnessThresholdsOfPeakRefreshRate">
-        <item>29</item>
+        <item>22</item>
     </integer-array>
     <integer-array translatable="false" name="config_ambientThresholdsOfPeakRefreshRate">
         <item>-1</item>

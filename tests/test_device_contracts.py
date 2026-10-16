@@ -163,6 +163,8 @@ class DeviceContracts(unittest.TestCase):
         # (min_brightness 1, max_brightness 20479), and the panel takes it as is.
         props = (ROOT / "vendor.prop").read_text()
         self.assertRegex(props, r"(?m)^ro\.vendor\.mtk_backlight_hwc_support=1$")
+        # Sync backlight mode (led_type 1) leaves the panel without a writer on this ROM.
+        self.assertRegex(props, r"(?m)^vendor\.debug\.hwc\.plat_switch_clear_bit=15$")
         display = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
         points = [(float(p.find("value").text), float(p.find("nits").text))
                   for p in display.find("screenBrightnessMap").iter("point")]

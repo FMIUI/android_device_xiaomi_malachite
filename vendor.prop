@@ -362,6 +362,13 @@ sys.fflag.override.settings_seamless_transfer=true
 # composer writes 1 + 20478 * the framework's backlight float to lcd-backlight, which the
 # panel takes as its level; configs/display_id_*.xml maps those levels to stock's nits.
 ro.vendor.mtk_backlight_hwc_support=1
+# With the composer on the backlight, it puts lcd-backlight into MediaTek's sync mode
+# (led_type 1, because the DTB's led_mode is 4) when platform switch bit 15 is set. In
+# that mode the kernel no longer writes the level to the panel; on stock, Xiaomi's display
+# service (not shipped) writes it to mi_display's backlight node. Clear bit 15:
+# HWCMediator::updatePlatformConfig applies this before every BrightnessWrap update, at
+# start and on each dump, then resets the property to -1; the cleared bit stays.
+vendor.debug.hwc.plat_switch_clear_bit=15
 
 # Surface Flinger
 debug.sf.auto_latch_unsignaled=1

@@ -165,6 +165,9 @@ class DeviceContracts(unittest.TestCase):
         self.assertRegex(props, r"(?m)^ro\.vendor\.mtk_backlight_hwc_support=1$")
         # Sync backlight mode (led_type 1) leaves the panel without a writer on this ROM.
         self.assertRegex(props, r"(?m)^vendor\.debug\.hwc\.plat_switch_clear_bit=15$")
+        # init drops vendor.prop lines vendor_init may not set, without failing the boot.
+        self.assertIn("set_prop(vendor_init, vendor_mtk_hwc_debug_log_prop)",
+                      (ROOT / "sepolicy/vendor/vendor_init.te").read_text())
         display = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
         points = [(float(p.find("value").text), float(p.find("nits").text))
                   for p in display.find("screenBrightnessMap").iter("point")]

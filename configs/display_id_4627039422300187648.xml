@@ -130,8 +130,10 @@
         </darkeningThresholds>
     </ambientBrightnessChangeThresholds>
     <highBrightnessMode enabled="true">
-        <!-- Transition point brightness from normal to HBM mode -->
-        <transitionPoint>0.513737</transitionPoint>
+        <!-- Transition point from normal to HBM mode, as a BACKLIGHT value on the map's scale
+             (DisplayDeviceConfig reads it as backlight and rejects it at boot unless it is below
+             config_screenBrightnessSettingMaximumFloat): 500 nits. -->
+        <transitionPoint>0.103015</transitionPoint>
         <!-- Minimum lux to enter HBM -->
         <minimumLux>6001</minimumLux>
         <!-- Time limitation for HBM. All zeros leave no remaining time, and

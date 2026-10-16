@@ -194,9 +194,16 @@ class DeviceContracts(unittest.TestCase):
                     return (value - points[0][0]) / (points[-1][0] - points[0][0])
             raise AssertionError(target)
 
-        # Sunlight brightness starts at 500 nits, as stock.
+        # Sunlight brightness starts at 500 nits, as stock. DisplayDeviceConfig reads the
+        # transition point as a backlight value and throws at boot (system_server bootloop)
+        # unless it is below the backlight maximum.
         transition = float(display.find("highBrightnessMode/transitionPoint").text)
-        self.assertAlmostEqual(transition, brightness_at(500), delta=0.002)
+        self.assertLess(transition, dimens["config_screenBrightnessSettingMaximumFloat"])
+        self.assertGreater(transition, dimens["config_screenBrightnessSettingMinimumFloat"])
+        for (v0, n0), (v1, n1) in zip(points, points[1:]):
+            if n0 <= 500 <= n1:
+                self.assertAlmostEqual(transition, v0 + (v1 - v0) * (500 - n0) / (n1 - n0),
+                                       delta=0.000002)
         # The default stays at about 75 nits.
         self.assertAlmostEqual(dimens["config_screenBrightnessSettingDefaultFloat"],
                                brightness_at(75), delta=0.002)

@@ -65,16 +65,15 @@ ro.bluetooth.a2dp_offload.supported=true
 persist.bluetooth.a2dp_offload.cap=sbc-aac
 persist.bluetooth.a2dp_offload.disabled=false
 
-# LE Audio hardware offload: the audio DSP encodes and decodes LC3, through
-# the LE Audio ports of the primary module (stock's MediaTek offload ports;
-# stock itself leaves this off). The Bluetooth stack needs disabled=false set
-# explicitly (codec_manager.cc defaults it to true). Developer options "Disable
-# LE audio hardware offload", or disabling A2DP offload, sets
-# persist.bluetooth.leaudio_offload.disabled=true; after a reboot the stack
-# encodes LC3 in software and audio policy reads
-# audio_policy_configuration_le_offload_disabled.xml (or the A2DP one).
+# LE Audio: software LC3 by default, as stock. With hardware offload (the audio
+# DSP through the primary module's LE Audio ports, which stock never enables)
+# LE Audio connected but the sound stayed on the phone's speaker (tester,
+# 20261016-5); with "Disable LE audio hardware offload" it played on the
+# earbuds. disabled=true makes the stack encode LC3 in software and audio policy
+# read audio_policy_configuration_le_offload_disabled.xml. supported=true keeps
+# the Developer options switch, so offload can still be tried.
 ro.bluetooth.leaudio_offload.supported=true
-persist.bluetooth.leaudio_offload.disabled=false
+persist.bluetooth.leaudio_offload.disabled=true
 
 # LE Audio (unicast). Stock switches every profile off. Earbuds that also speak
 # classic Bluetooth stay on A2DP and HFP until LE Audio is switched on in their

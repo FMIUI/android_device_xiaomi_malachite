@@ -384,7 +384,7 @@ class DeviceContracts(unittest.TestCase):
                      "persist.bluetooth.a2dp_offload.disabled=false",
                      "persist.bluetooth.a2dp_offload.cap=sbc-aac",
                      "ro.bluetooth.leaudio_offload.supported=true",
-                     "persist.bluetooth.leaudio_offload.disabled=false"):
+                     "persist.bluetooth.leaudio_offload.disabled=true"):
             with self.subTest(prop=line):
                 self.assertRegex(props, rf"(?m)^{re.escape(line)}$")
         self.assertNotIn("persist.bluetooth.bluetooth_audio_hal.disabled", props)

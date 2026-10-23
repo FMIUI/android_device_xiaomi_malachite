@@ -11,7 +11,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, device/xiaomi/malachite/device.mk)
 
 # Inherit some common LineageOS stuff.
-$(call inherit-product, vendor/axion/config/common_full_phone.mk)
+$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 
 # Tester builds, the default until the ROM is released: ro.debuggable=1 with
 # ADB authorisation kept, so testers can switch on Rooted debugging for checks

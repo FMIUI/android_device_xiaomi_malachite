@@ -163,11 +163,13 @@ class DeviceContracts(unittest.TestCase):
         # (min_brightness 1, max_brightness 20479), and the panel takes it as is.
         props = (ROOT / "vendor.prop").read_text()
         self.assertRegex(props, r"(?m)^ro\.vendor\.mtk_backlight_hwc_support=1$")
-        # Sync backlight mode (led_type 1) leaves the panel without a writer on this ROM.
-        self.assertRegex(props, r"(?m)^vendor\.debug\.hwc\.plat_switch_clear_bit=15$")
-        # init drops vendor.prop lines vendor_init may not set, without failing the boot.
-        self.assertIn("set_prop(vendor_init, vendor_mtk_hwc_debug_log_prop)",
-                      (ROOT / "sepolicy/vendor/vendor_init.te").read_text())
+        # The composer keeps its sync backlight mode (level written after the frame), but
+        # led_type must stay 0: the prebuilt kernel never applies the sync level (CSC_BL).
+        self.assertNotIn("plat_switch_clear_bit", props)
+        rc = (ROOT / "init/init.mt6878.rc").read_text()
+        self.assertIn("chmod 0444 /sys/class/leds/lcd-backlight/led_type", rc)
+        self.assertIn("chown root root /sys/class/leds/lcd-backlight/led_type", rc)
+        self.assertNotIn("chown system system /sys/class/leds/lcd-backlight/led_type", rc)
         display = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
         points = [(float(p.find("value").text), float(p.find("nits").text))
                   for p in display.find("screenBrightnessMap").iter("point")]

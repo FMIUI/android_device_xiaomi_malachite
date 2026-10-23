@@ -371,6 +371,38 @@ class DeviceContracts(unittest.TestCase):
                 with self.subTest(file=name, sink=sink):
                     self.assertEqual(routes[sink], ["a2dp output"])
 
+    def test_le_audio_offload_capabilities_are_installed(self):
+        # MediaTek's provider reads LE Audio offload capabilities only from
+        # /vendor/etc/le_audio_codec_capabilities.xml (configs/audio is copied to
+        # vendor/etc). With no file the stack has no offload configuration at all.
+        device = (ROOT / "device.mk").read_text()
+        self.assertIn("$(call find-copy-subdir-files,*,$(DEVICE_PATH)/configs/audio/,"
+                      "$(TARGET_COPY_OUT_VENDOR)/etc)", device)
+        setting = ET.parse(ROOT / "configs/audio/le_audio_codec_capabilities.xml").getroot()
+        self.assertEqual(setting.tag, "leAudioOffloadSetting")
+        codecs = {node.get("name"): node for node in setting.iter("codecConfiguration")}
+        strategies = {node.get("name"): node for node in setting.iter("strategyConfiguration")}
+        configurations = {node.get("name"): node for node in setting.iter("configuration")}
+        for name, node in configurations.items():
+            with self.subTest(configuration=name):
+                self.assertIn(node.get("codecConfiguration"), codecs)
+                self.assertIn(node.get("strategyConfiguration"), strategies)
+        for scenario in setting.iter("scenario"):
+            for key in ("encode", "decode", "broadcast"):
+                value = scenario.get(key)
+                if value not in (None, "invalid"):
+                    self.assertIn(value, configurations)
+        for name, node in codecs.items():
+            self.assertEqual(node.get("codec"), "LC3", name)
+        for node in strategies.values():
+            self.assertIsNone(node.get("audioChannelAllocation"))
+        # BAP 48_4 (48 kHz, 10 ms, 120 octets) for two earbuds, one CIS each.
+        self.assertIn(("48000", "10000", "120"),
+                      {(c.get("samplingFrequency"), c.get("frameDurationUs"),
+                        c.get("octetsPerCodecFrame")) for c in codecs.values()})
+        encode = {scenario.get("encode") for scenario in setting.iter("scenario")}
+        self.assertIn("OneChanStereo_48_4", encode)
+
     def test_policy_file_follows_the_offload_switches(self):
         # system/media audio_config.h, with ro.bluetooth.a2dp_offload.supported=true:
         # persist.bluetooth.a2dp_offload.disabled=true selects

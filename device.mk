@@ -191,11 +191,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     init.euicc.rc
 
-# Face unlock (ParanoidSense, front camera). frameworks/base registers its
 # SenseProvider only when ro.face.sense_service is true. It registers as
 # STRENGTH_WEAK, so it can never release keystore-bound keys.
 PRODUCT_PACKAGES += \
-    ParanoidSense
 
 PRODUCT_SYSTEM_EXT_PROPERTIES += \
     ro.face.sense_service=true
@@ -480,8 +478,6 @@ PRODUCT_COPY_FILES += \
 
 # Thermal
 PRODUCT_PACKAGES += \
-    android.hardware.thermal-service.pixel \
-    thermal_symlinks
 
 PRODUCT_PACKAGES += \
     init.mt6878.thermal.rc
@@ -538,3 +534,4 @@ PRODUCT_COPY_FILES += \
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/malachite/malachite-vendor.mk)
 PRODUCT_SOONG_NAMESPACES += hardware/google/pixel/usb
+PRODUCT_SOONG_NAMESPACES += hardware/google/pixel/pixelstats

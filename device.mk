@@ -537,3 +537,4 @@ PRODUCT_COPY_FILES += \
 
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/malachite/malachite-vendor.mk)
+PRODUCT_SOONG_NAMESPACES += hardware/google/pixel/usb

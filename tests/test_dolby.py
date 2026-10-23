@@ -142,8 +142,8 @@ class DolbyTests(unittest.TestCase):
         self.assertRegex(repository, r"fun applySavedState\(\) \{[^}]*\}[^}]*applyMiSound\(\)")
 
 
-# Dolby Codec2 decoders from stock OS2.0.208.0.VOOMIXM, served over AIDL by
-# dolby/codec2 instead of stock's HIDL services.
+# Dolby Codec2 decoders from stock OS2.0.208.0.VOOMIXM, served by dolby/codec2
+# (AIDL or HIDL, following media.c2.hal.selection) instead of stock's HIDL services.
 CODEC_BLOBS = (
     "vendor/etc/dolby_vision.cfg",
     "vendor/etc/media_codecs_dolby_audio.xml",
@@ -174,7 +174,7 @@ class DolbyCodecTests(unittest.TestCase):
                 self.assertIn(blob, lines)
 
     def test_stock_hidl_services_are_not_shipped(self):
-        # The AIDL wrapper replaces them; the framework would not list them anyway.
+        # dolby/codec2 replaces them.
         text = (ROOT / "proprietary-files.txt").read_text()
         for blob in ("vendor/bin/hw/dolbycodec2", "vendor/bin/hw/vendor.dolby.media.c2@1.0-service",
                      "vendor.dolby.media.c2@1.0-service.rc", "vendor.dolbyvision.media.c2@1.0-service.rc",
@@ -209,6 +209,22 @@ class DolbyCodecTests(unittest.TestCase):
         instances = {hal.findtext("fqname") for hal in manifest.iter("hal")
                      if hal.get("format") == "aidl" and hal.findtext("name") == "android.hardware.media.c2"}
         self.assertEqual(instances, {"IComponentStore/default1", "IComponentStore/default2"})
+        # Same instances over HIDL, for media.c2.hal.selection=hidl.
+        hidl = {inst.text for hal in manifest.iter("hal")
+                if hal.get("format") == "hidl" and hal.findtext("name") == "android.hardware.media.c2"
+                and hal.findtext("version") == "1.2"
+                for inst in hal.iter("instance")}
+        self.assertEqual(hidl, {"default1", "default2"})
+        service = (ROOT / "dolby/codec2/service.cpp").read_text()
+        self.assertIn("utils::IsSelected()", service)
+        self.assertIn("registerAsService(instance)", service)
+
+    def test_codec2_uses_the_hidl_hal_like_stock(self):
+        # MediaTek's decoders (stock 208 blobs) only know BufferQueue output
+        # pools; AIDL hands them IGBA pools instead. Stock selects HIDL.
+        props = (ROOT / "vendor.prop").read_text()
+        self.assertIn("media.c2.hal.selection=hidl", props.splitlines())
+        self.assertNotIn("media.c2.hal.selection=aidl", props)
 
     def test_codec_list_matches_stock(self):
         codecs = ET.parse(ROOT / "configs/media/media_codecs_c2.xml").getroot()

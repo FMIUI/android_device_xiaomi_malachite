@@ -4,8 +4,7 @@
 //
 
 // Serves stock's Dolby Codec2 stores (Dolby Vision video, Dolby Digital
-// Plus/AC-4 audio) over AIDL. Stock runs them as HIDL services, which the
-// framework does not list with media.c2.hal.selection=aidl.
+// Plus/AC-4 audio) over AIDL or HIDL, following media.c2.hal.selection.
 cc_binary {
     name: "android.hardware.media.c2-dolby-service",
     vendor: true,

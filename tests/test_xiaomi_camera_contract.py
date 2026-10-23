@@ -67,5 +67,15 @@ class XiaomiCameraContractTests(unittest.TestCase):
         self.assertIn("binder_call(hal_aidlbgservice, platform_app)", client)
 
 
+    def test_downloaded_feature_split_libraries_can_be_mapped(self):
+        # Panorama, clone, vlog... are qigsaw splits whose native libraries
+        # live in the app's own data directory (app_data_file).
+        policy = (ROOT / "sepolicy/private/platform_app.te").read_text()
+        rules = [line.strip() for line in policy.splitlines()
+                 if line.strip() and not line.lstrip().startswith("#")]
+        self.assertIn("allow platform_app app_data_file:file execute;", rules)
+        # execve() of app data stays denied, as for every other app domain.
+        self.assertFalse(any("execute_no_trans" in rule for rule in rules))
+
 if __name__ == "__main__":
     unittest.main()

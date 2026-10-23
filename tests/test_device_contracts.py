@@ -562,6 +562,11 @@ class DeviceContracts(unittest.TestCase):
                  if "BLE" in port.get("type")}
         self.assertEqual({tag: (port.get("type"), port.get("role"))
                           for tag, port in ports.items()}, BLE_OFFLOAD_PORTS)
+        # AudioPolicyManager::getHwOffloadFormatsSupportedForBluetoothMedia reads the
+        # primary module's BLE encodedFormats; codec_manager.cc offloads no configuration
+        # whose codec is missing from that list.
+        for tag, port in ports.items():
+            self.assertEqual(port.get("encodedFormats"), "AUDIO_FORMAT_LC3", tag)
         for tag, port in ports.items():
             mask = "AUDIO_CHANNEL_IN_MONO" if port.get("role") == "source" \
                 else "AUDIO_CHANNEL_OUT_MONO"

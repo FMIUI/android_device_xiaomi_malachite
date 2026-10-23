@@ -11,7 +11,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 $(call inherit-product, device/xiaomi/malachite/device.mk)
 
 # Inherit some common LineageOS stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+$(call inherit-product, vendor/axion/config/common_full_phone.mk)
 
 # Tester builds, the default until the ROM is released: ro.debuggable=1 with
 # ADB authorisation kept, so testers can switch on Rooted debugging for checks
@@ -24,14 +24,33 @@ ifneq ($(MALACHITE_RELEASE),true)
 PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG :=
 endif
 
-PRODUCT_NAME := lineage_malachite
+PRODUCT_NAME := axion_malachite
 PRODUCT_DEVICE := malachite
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := Redmi
 PRODUCT_MODEL := 24090RA29G
 
+AXION_MAINTAINER := Zoro
+AXION_CAMERA_REAR_INFO := 200,8,2
+AXION_CAMERA_FRONT_INFO := 20
+AXION_PROCESSOR := Dimensity_7300_Ultra
+
 PRODUCT_SYSTEM_NAME := malachite_global
 PRODUCT_SYSTEM_DEVICE := malachite
+
+TARGET_INCLUDE_AXFX := false
+
+# safely disable libperfmgr without breaking boot (set to true)
+TARGET_DISABLES_LIBPERF ?= false
+
+# doze flags
+# for devices with doze/sensor related issues 
+TARGET_NEEDS_DOZE_FIX := false
+# doze gestures
+TARGET_DOZE_TAP_PULSE_SUPPORTED ?= false
+TARGET_DOZE_DOUBLE_TAP_PULSE_SUPPORTED ?= false
+TARGET_DOZE_PICKUP_PULSE_SUPPORTED ?= false
+TARGET_DOZE_SIDE_FPS_PULSE_SUPPORTED ?= false
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
     BuildFingerprint=Xiaomi/hal_mgvi_64_armv82_mt6878_global/mgvi_64_armv82:14/UP1A.231005.007/OS3.0.10.0.WOOMIXM:user/release-keys \

@@ -4,4 +4,9 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_malachite.mk
+    $(LOCAL_DIR)/axion_malachite.mk
+
+COMMON_LUNCH_CHOICES += \
+    axion_malachite-user \
+    axion_malachite-userdebug \
+    axion_malachite-eng

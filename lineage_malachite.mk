@@ -24,7 +24,7 @@ ifneq ($(MALACHITE_RELEASE),true)
 PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG :=
 endif
 
-PRODUCT_NAME := axion_malachite
+PRODUCT_NAME := lineage_malachite
 PRODUCT_DEVICE := malachite
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := Redmi

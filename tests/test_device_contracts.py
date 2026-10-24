@@ -630,6 +630,12 @@ class DeviceContracts(unittest.TestCase):
         node = "/sys/devices/platform/goodix_ts.0/goodix_ts_report_rate"
         self.assertIn("vendor.lineage.touch-service.malachite", (ROOT / "device.mk").read_text())
         self.assertIn(node, (ROOT / "touch/HighTouchPollingRate.cpp").read_text())
+        hal = (ROOT / "touch/HighTouchPollingRate.cpp").read_text()
+        # Stock's 480 Hz: Touch_Game_Mode (0) = 1 through /dev/xiaomi-touch -> GT9916R 0xC1.
+        self.assertIn('"/dev/xiaomi-touch"', hal)
+        self.assertIn("kTouchGameMode = 0", hal)
+        self.assertIn("allow hal_lineage_touch_default vendor_touchfeature_device:chr_file",
+                      (ROOT / "sepolicy/vendor/hal_lineage_touch_default.te").read_text())
         rc = (ROOT / "touch/vendor.lineage.touch-service.malachite.rc").read_text()
         self.assertIn("chown system system " + node, rc)
         self.assertIn("genfscon sysfs " + node[len("/sys"):] +

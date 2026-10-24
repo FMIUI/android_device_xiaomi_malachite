@@ -62,6 +62,30 @@ their clamp when paused or closed, and a stale session times out after
 `StaleTimeFactor` frame periods. If they appear, write `128` back to the
 ceiling to confirm the cause.
 
+## GPU floor on touch
+
+GED's frame-based DVFS aims at the panel period and gets no UI target:
+FPSGO only controls game queues, and HWUI's are left uncontrolled. On the
+20261016 build a Settings scroll kept the GPU at its lowest OPP (35,
+265 MHz) for every sample, with GED utilisation up to 98% and 2–4% janky
+frames. Stock relies on FPSGO's FBT rescue during scrolling instead.
+
+`INTERACTION` now sets `/sys/kernel/ged/hal/custom_boost_gpu_freq` to 24,
+a 508 MHz floor; GED can still go higher. With that floor set by hand
+(2026-10-24 sprint, `malachite-research/2026-10-24/REPORT.md`) jank went to
+0%, p50 frame time from 12 to 8 ms, and a 120 Hz scroll delivered 19% more
+frames. Battery current in an A/B/A run did not rise (1313 / 1266 /
+1243 mW), because the CPUs spent less time at their top frequencies.
+The hint itself has not been built or measured yet.
+
+The phone has `vendor.powerhal.disp.idle_support=false`, so the power HAL's
+`InteractionHandler` calls `DoHint("INTERACTION", duration)` and that
+duration replaces each action's `Duration`: at least 1400 ms
+(`vendor.powerhal.interaction.min`), renewed by every user-activity boost
+while a finger is down. The floor therefore covers a drag and most of the
+fling after it, like the CPU boosts beside it. The node resets to 35 (no
+floor) when the HAL starts.
+
 ## Governor: sugov_ext
 
 After boot the tree selects `sugov_ext` (`cpufreq_sugov_ext.ko`), MediaTek's

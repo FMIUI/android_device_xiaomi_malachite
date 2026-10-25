@@ -497,6 +497,9 @@ PRODUCT_PACKAGES += \
     android.hardware.usb-service.mediatek \
     android.hardware.usb.gadget-service.mediatek
 
+# Our stock-derived init.mt6878.usb.rc (init/), not hardware/mediatek's common one.
+$(call soong_config_set_bool,mediatek_gadget,use_custom_usb_gadget_rc,true)
+
 PRODUCT_PACKAGES += \
     init.mt6878.usb.rc
 

@@ -213,6 +213,17 @@ class DeviceContracts(unittest.TestCase):
         self.assertAlmostEqual(dimens["config_screenBrightnessSettingDefaultFloat"],
                                brightness_at(75), delta=0.002)
 
+    def test_brightness_ramp_durations_match_stock(self):
+        # Stock framework-ext-res config_animation_duration_{hdr_brightness,manual_dimming,
+        # manual_brightness,dim}; the window override uses stock's manual duration.
+        config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
+        integers = {node.get("name"): int(node.text) for node in config.getroot().iter("integer")}
+        self.assertEqual(integers["config_brightnessRampHdrDurationMillis"], 4000)
+        self.assertEqual(integers["config_brightnessRampTemporaryDurationMillis"], 500)
+        self.assertEqual(integers["config_brightnessRampManualDurationMillis"], 800)
+        self.assertEqual(integers["config_brightnessRampOverrideDurationMillis"], 800)
+        self.assertEqual(integers["config_brightnessRampDimDurationMillis"], 1200)
+
     def test_low_brightness_keeps_one_refresh_rate(self):
         overlay = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
         root = overlay.getroot()

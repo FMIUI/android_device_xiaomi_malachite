@@ -12,6 +12,14 @@ class UsbGadgetInitTests(unittest.TestCase):
         self.assertIn("$(call soong_config_set_bool,mediatek_gadget,use_custom_usb_gadget_rc,true)",
                       (ROOT / "device.mk").read_text())
 
+    def test_xiaomi_wlan_assistant_is_kept(self):
+        # Stock's wlan_assistant picks the Wi-Fi NVRAM by board id; hardware/mediatek's must not
+        # be built beside it (same module name).
+        self.assertIn("$(call soong_config_set_bool,mediatek_wlan,use_vendor_wlan_assistant,true)",
+                      (ROOT / "device.mk").read_text())
+        self.assertIn("vendor/bin/wlan_assistant",
+                      (ROOT / "proprietary-files.txt").read_text().splitlines())
+
 
 if __name__ == "__main__":
     unittest.main()

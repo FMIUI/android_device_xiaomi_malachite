@@ -500,6 +500,10 @@ PRODUCT_PACKAGES += \
 # Our stock-derived init.mt6878.usb.rc (init/), not hardware/mediatek's common one.
 $(call soong_config_set_bool,mediatek_gadget,use_custom_usb_gadget_rc,true)
 
+# Xiaomi's wlan_assistant (vendor blob) loads the region's Wi-Fi NVRAM by board id;
+# hardware/mediatek's own one doesn't.
+$(call soong_config_set_bool,mediatek_wlan,use_vendor_wlan_assistant,true)
+
 PRODUCT_PACKAGES += \
     init.mt6878.usb.rc
 

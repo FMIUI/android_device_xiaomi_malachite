@@ -51,6 +51,17 @@ line; where a commit needed adapting, its message says what changed and why.
   a second, different service label fails `service_contexts`. The device
   entries were removed. Upstream's `hal_audio_service` lets the audio HAL
   register the service, and audio clients and the Bluetooth stack look it up.
+- **Soong namespaces.** lineage-24.0 splits `hardware/google/pixel` into
+  `health`, `pixelstats`, `power-libperfmgr`, `thermal` and `usb` namespaces.
+  The thermal HAL and `thermal_symlinks` now live in `thermal`. The power HAL
+  installs `libperfmgr` from `power-libperfmgr`, and the thermal HAL installs
+  `libpixelstats` and `pixelatoms-cpp` from `pixelstats`. Those three are now in
+  `PRODUCT_SOONG_NAMESPACES`; `usb` only provides a static library to
+  hardware/mediatek, which imports it. hardware/mediatek also folded its
+  `libaedv` namespace into the main one, so `hardware/mediatek/libaedv` was
+  removed from `PRODUCT_SOONG_NAMESPACES` and from the vendor namespace imports
+  (`extract-files.py`, regenerated `Android.bp`); a namespace that no longer
+  exists stops Soong.
 - **Build variables.** vendor/lineage adds `fastbootd` itself, and removed
   `TARGET_KERNEL_NO_GCC` (kernels always build with LLVM now); both lines were
   dropped.
@@ -73,7 +84,7 @@ line; where a commit needed adapting, its message says what changed and why.
 
 | Check | Result |
 | --- | --- |
-| Device tree `python3 -m unittest discover -s tests` | 190 run, 0 failures, 1 skip (needs stock `MiCamCPUControl.xml`); with sepolicy_vndr and hardware/dolby beside the tree |
+| Device tree `python3 -m unittest discover -s tests` | 192 run, 0 failures, 1 skip (needs stock `MiCamCPUControl.xml`); with sepolicy_vndr, hardware/mediatek and hardware/dolby beside the tree |
 | vendor tree tests | 8 run, OK |
 | wpa_supplicant `tests/wpa_version_3/run.sh` | all cases PASS |
 | hardware/mediatek `tests/` | 2 run, OK |

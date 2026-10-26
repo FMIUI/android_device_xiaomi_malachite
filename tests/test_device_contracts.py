@@ -518,6 +518,33 @@ class DeviceContracts(unittest.TestCase):
         self.assertIn("'vendor/bin/mnld': blob_fixup()\n"
                       "        .replace_needed('libmnl.so', 'libmnl_mtk.so')", fixups)
 
+    def test_pixel_namespaces_of_installed_modules_are_exported(self):
+        # lineage-24.0 splits hardware/google/pixel into namespaces. The thermal HAL and
+        # thermal_symlinks live in thermal; the power HAL installs libperfmgr from
+        # power-libperfmgr and thermal installs libpixelstats/pixelatoms-cpp from pixelstats.
+        mk = (ROOT / "device.mk").read_text()
+        block = mk[mk.index("PRODUCT_SOONG_NAMESPACES += \\"):]
+        block = block[:block.index("\n\n")]
+        for namespace in ("hardware/google/pixel/pixelstats",
+                          "hardware/google/pixel/power-libperfmgr",
+                          "hardware/google/pixel/thermal"):
+            self.assertIn(f"    {namespace} \\\n", block)
+        self.assertIn("android.hardware.thermal-service.pixel", mk)
+
+    def test_mediatek_namespaces_exist(self):
+        # lineage-24.0 folded hardware/mediatek/libaedv into the hardware/mediatek
+        # namespace; exporting or importing a namespace that is gone stops Soong.
+        mk = (ROOT / "device.mk").read_text()
+        fixups = (ROOT / "extract-files.py").read_text()
+        self.assertNotIn("hardware/mediatek/libaedv", mk)
+        self.assertNotIn("hardware/mediatek/libaedv", fixups)
+        mediatek = ROOT.parent / "hardware_mediatek"
+        if not mediatek.is_dir():
+            self.skipTest("hardware_mediatek is not checked out beside the tree")
+        for name in sorted(set(re.findall(r"hardware/mediatek(/[\w-]+)?\b", mk + fixups))):
+            with self.subTest(namespace="hardware/mediatek" + name):
+                self.assertIn("soong_namespace", (mediatek / name.lstrip("/") / "Android.bp").read_text())
+
     def test_manifest_projects_use_the_lineage_24_branches(self):
         root = ET.parse(ROOT / "manifests/malachite.xml").getroot()
         for project in root.findall("project"):

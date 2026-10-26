@@ -38,7 +38,6 @@ from blob_fixups_camera import (
 namespace_imports = [
     'device/xiaomi/malachite',
     'hardware/mediatek',
-    'hardware/mediatek/libaedv',
     'hardware/xiaomi',
 ]
 

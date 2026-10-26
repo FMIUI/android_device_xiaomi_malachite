@@ -100,8 +100,10 @@ blob_fixups: blob_fixups_user_type = {
     'system_ext/lib64/vendor.mediatek.hardware.camera.isphal-V1-ndk.so': blob_fixup()
         .replace_needed('android.hardware.graphics.common-V6-ndk.so', 'android.hardware.graphics.common-V7-ndk.so'),
 
+    # Newest soundtrigger3: its types share android.media.audio.common.types
+    # with libaudio_aidl_conversion_common_ndk (V5 on Android 17).
      'vendor/lib64/hw/android.hardware.soundtrigger3-impl.so': blob_fixup()
-        .replace_needed('android.hardware.soundtrigger3-V1-ndk.so', 'android.hardware.soundtrigger3-V3-ndk.so'),
+        .replace_needed('android.hardware.soundtrigger3-V1-ndk.so', 'android.hardware.soundtrigger3-V4-ndk.so'),
 
      'vendor/lib64/hw/audio.primary.mt6878.so': blob_fixup()
         .replace_needed('libtinyxml2.so', 'libtinyxml2-v34.so')

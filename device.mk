@@ -528,6 +528,11 @@ PRODUCT_COPY_FILES += \
 # RSN/SAE path without changing authentication or protected management frames.
 $(call soong_config_set_bool,wpa_supplicant_8,wifi_disable_wpa_version_3,true)
 
+# libwifi-hal-mtk.so fills the function table in its pre-Android 14 QPR2 layout.
+# Without this the wrapper copies it with the newer layout and every call after
+# the RTT entries lands on the wrong vendor function.
+$(call soong_config_set_bool,mediatek_wifi_hal,use_pre_u_qpr2_struct,true)
+
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
     hostapd \

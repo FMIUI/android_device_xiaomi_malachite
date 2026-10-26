@@ -87,6 +87,9 @@ lib_fixups: lib_fixups_user_type = {
         # stock's V1 matches none of its frozen versions, so the stock audio
         # HALs keep their own copy (same file name, _vendor module name).
         'vendor.mediatek.hardware.bluetooth.audio-V1-ndk',
+        # Built from source on lineage-24.0 for system_ext only; stock's
+        # vendor netdagent keeps its own copy.
+        'vendor.mediatek.hardware.netdagent@1.0',
     ): lib_fixup_vendor_suffix,
 }
 

@@ -1896,7 +1896,7 @@ vendor/lib64/libwifinvram.so
 vendor/lib64/libwifinvramdata.so
 vendor/lib64/libwpa_client.so
 vendor/lib64/vendor.mediatek.hardware.netdagent-V1-ndk.so
-vendor/lib64/vendor.mediatek.hardware.netdagent@1.0.so
+vendor/lib64/vendor.mediatek.hardware.netdagent@1.0.so;MODULE_SUFFIX=_vendor
 
 # WiFi (Firmware)
 vendor/firmware/txpowerctrl.cfg

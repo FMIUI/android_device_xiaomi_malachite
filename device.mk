@@ -551,8 +551,8 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.wifi.rtt.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.rtt.xml \
     frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml
 
-# MediaTek AEE backtrace helper: LineageOS's stub from hardware/mediatek/libaedv instead
-# of stock's libladder, which keeps dumping backtraces with no AEE to receive them.
+# MediaTek AEE backtrace helper: LineageOS's libladder stub (hardware/mediatek) instead
+# of stock's, which keeps dumping backtraces with no AEE to receive them.
 PRODUCT_PACKAGES += \
     libladder
 

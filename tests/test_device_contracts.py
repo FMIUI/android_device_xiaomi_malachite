@@ -135,6 +135,16 @@ class DeviceContracts(unittest.TestCase):
         # 0x10d, expert wide colour, shows only a faint red without Xiaomi's display service.
         self.assertNotIn("269", modes)
 
+    def test_lcd_density_matches_density_mapping(self):
+        # Without ro.sf.lcd_density, DENSITY_DEVICE_STABLE is 160 and Play installs mdpi
+        # resource splits, so app images are upscaled 3x.
+        board = re.search(r"(?m)^TARGET_SCREEN_DENSITY := (\d+)$",
+                          (ROOT / "BoardConfig.mk").read_text())
+        self.assertIsNotNone(board)
+        mapping = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
+        densities = [d.text for d in mapping.iter("density") if d.text and d.text.strip().isdigit()]
+        self.assertEqual(densities, [board.group(1)])
+
     def test_hdr_headroom_is_the_calibrated_curve(self):
         hbm = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot().find(
             "highBrightnessMode")

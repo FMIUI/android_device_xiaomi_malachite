@@ -561,15 +561,18 @@ class DeviceContracts(unittest.TestCase):
             self.assertNotIn(name, mapped)
             self.assertIn(f"vendor/etc/audio_param/{name}", lines)
 
-    def test_manifest_takes_lineages_bluetooth_stack(self):
-        # LineageOS 507009 fixes the coex window wrap-around that can hold the A2DP
-        # offload start. The lineage-23.2 fork carried it; lineage-24.0 has it merged,
-        # so the manifest no longer replaces LineageOS's project.
+    def test_manifest_takes_the_bluetooth_fork_for_le_audio(self):
+        # LineageOS 507009 (A2DP offload coex wrap-around) is merged in lineage-24.0,
+        # but the LE Audio fixes from lineage-23.2 are not, so the fork's lineage-24.0
+        # branch (LineageOS's plus those fixes) replaces LineageOS's project.
         root = ET.parse(ROOT / "manifests/malachite.xml").getroot()
         removed = {node.get("path") for node in root.findall("remove-project")}
-        projects = {p.get("path") for p in root.findall("project")}
-        self.assertNotIn("packages/modules/Bluetooth", removed)
-        self.assertNotIn("packages/modules/Bluetooth", projects)
+        projects = {p.get("path"): p for p in root.findall("project")}
+        self.assertIn("packages/modules/Bluetooth", removed)
+        bt = projects["packages/modules/Bluetooth"]
+        self.assertEqual(bt.get("name"), "android_packages_modules_Bluetooth")
+        self.assertEqual(bt.get("remote"), "malachite-project")
+        self.assertEqual(bt.get("revision"), "lineage-24.0")
 
     def test_blobs_named_like_android_17_modules_are_renamed(self):
         # Android 17 adds external/libmnl (netlink), which MediaTek's GNSS libmnl must

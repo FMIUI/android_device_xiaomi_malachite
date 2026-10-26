@@ -158,6 +158,16 @@
       "ResetOnInit": true
     },
     {
+      "Name": "GpuFreqFloor",
+      "Path": "/sys/kernel/ged/hal/custom_boost_gpu_freq",
+      "Values": [
+        "24",
+        "35"
+      ],
+      "DefaultIndex": 1,
+      "ResetOnInit": true
+    },
+    {
       "Name": "MemFreq",
       "Path": "/sys/devices/platform/soc/1c00f000.dvfsrc/mtk-dvfsrc-devfreq/devfreq/mtk-dvfsrc-devfreq/userspace/set_freq",
       "Values": [
@@ -243,6 +253,12 @@
       "Node": "UclampTAMin",
       "Duration": 58,
       "Value": "12.5"
+    },
+    {
+      "PowerHint": "INTERACTION",
+      "Node": "GpuFreqFloor",
+      "Duration": 58,
+      "Value": "24"
     },
     {
       "PowerHint": "FIXED_PERFORMANCE",

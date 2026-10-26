@@ -748,3 +748,13 @@ class DeviceContracts(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LibladderStubTests(unittest.TestCase):
+    def test_stock_libladder_is_replaced_by_the_stub(self):
+        # hardware/mediatek/libaedv provides LineageOS's libladder stub; stock's copy must
+        # not be extracted next to it (duplicate module) and the stub must be installed.
+        blobs = (ROOT / "proprietary-files.txt").read_text().splitlines()
+        self.assertFalse([b for b in blobs if "libladder" in b])
+        self.assertRegex((ROOT / "device.mk").read_text(),
+                         r"PRODUCT_PACKAGES \+= \\\n    libladder\n")

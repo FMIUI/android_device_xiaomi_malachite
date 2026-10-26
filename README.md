@@ -1,19 +1,21 @@
-# LineageOS 23.2 for the Redmi Note 14 Pro 5G / POCO X7 5G (malachite)
+# LineageOS 24.0 for the Redmi Note 14 Pro 5G / POCO X7 5G (malachite)
 
-Device tree for an unofficial LineageOS 23.2 (Android 16) build for malachite.
+Device tree for an unofficial LineageOS 24.0 (Android 17) build for malachite.
 
 **Downloads, updates and support:** [Telegram group](https://t.me/malachite_project)
 
 ## Branch
 
-`lineage-23.2` is the only branch, in this repository and in every other
+`lineage-24.0` is the current branch, in this repository and in every other
 [malachite-project](https://github.com/malachite-project) fork. To base work on
-these trees, use `lineage-23.2`.
+these trees, use `lineage-24.0`. `lineage-23.2` (Android 16) stays as it was;
+[bringup/LINEAGE-24.md](bringup/LINEAGE-24.md) lists what moving each fork to
+24.0 changed.
 
 ## Building
 
 `manifests/malachite.xml` is the local manifest for the whole tree: set up a
-LineageOS 23.2 checkout, copy it to `.repo/local_manifests/`, sync, then
+LineageOS 24.0 checkout, copy it to `.repo/local_manifests/`, sync, then
 `breakfast malachite`. The comment at its top lists what each fork changes.
 Kernel sources are built separately; see
 [kernel_manifest-6.1](https://github.com/malachite-project/kernel_manifest-6.1).

@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, revival/device-config-cleanup]
   pull_request:
-    branches: [main, lineage-23.2]
+    branches: [main, lineage-24.0]
 
 permissions:
   contents: read

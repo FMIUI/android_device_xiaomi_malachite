@@ -41,8 +41,9 @@ def ceiling():
 GROUP_BOOST_LIMIT = 12.5
 
 # Required AdpfConfig entries and their jsoncpp type checks, from
-# HintManager::ParseAdpfConfigs (hardware/google/pixel lineage-23.2). A
-# missing or mistyped entry drops every ADPF profile, silently disabling ADPF.
+# HintManager::ParseAdpfConfigs (hardware/google/pixel lineage-23.2, unchanged in
+# lineage-24.0). A missing or mistyped entry drops every ADPF profile, silently
+# disabling ADPF.
 ADPF_REQUIRED = {
     "PID_On": bool, "PID_Po": float, "PID_Pu": float, "PID_I": float,
     "PID_I_Init": int, "PID_I_High": int, "PID_I_Low": int,

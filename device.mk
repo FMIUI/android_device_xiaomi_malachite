@@ -220,10 +220,9 @@ PRODUCT_PRODUCT_PROPERTIES += \
 endif
 endif
 
-# Fastboot
+# Fastboot (vendor/lineage adds fastbootd itself since lineage-24.0)
 PRODUCT_PACKAGES += \
-    android.hardware.fastboot-service.example_recovery \
-    fastbootd
+    android.hardware.fastboot-service.example_recovery
 
 # Fingerprint
 $(call soong_config_set,XIAOMI_BIOMETRICS_FINGERPRINT,IMPL_VER,V2)

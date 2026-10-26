@@ -496,16 +496,33 @@ class DeviceContracts(unittest.TestCase):
             self.assertNotIn(name, mapped)
             self.assertIn(f"vendor/etc/audio_param/{name}", lines)
 
-    def test_manifest_takes_the_bluetooth_stack_with_the_coex_fix(self):
+    def test_manifest_takes_lineages_bluetooth_stack(self):
         # LineageOS 507009 fixes the coex window wrap-around that can hold the A2DP
-        # offload start; until it is merged in lineage-23.2 the fork carries it.
+        # offload start. The lineage-23.2 fork carried it; lineage-24.0 has it merged,
+        # so the manifest no longer replaces LineageOS's project.
         root = ET.parse(ROOT / "manifests/malachite.xml").getroot()
         removed = {node.get("path") for node in root.findall("remove-project")}
-        bluetooth = {p.get("path"): p for p in root.findall("project")}["packages/modules/Bluetooth"]
-        self.assertIn("packages/modules/Bluetooth", removed)
-        self.assertEqual(bluetooth.get("name"), "android_packages_modules_Bluetooth")
-        self.assertEqual(bluetooth.get("remote"), "malachite-project")
-        self.assertEqual(bluetooth.get("revision"), "lineage-23.2")
+        projects = {p.get("path") for p in root.findall("project")}
+        self.assertNotIn("packages/modules/Bluetooth", removed)
+        self.assertNotIn("packages/modules/Bluetooth", projects)
+
+    def test_blobs_named_like_android_17_modules_are_renamed(self):
+        # Android 17 adds external/libmnl (netlink), which MediaTek's GNSS libmnl must
+        # not replace. libformatter follows LineageOS's lineage-24.0 rename for Car.
+        blobs = (ROOT / "proprietary-files.txt").read_text().splitlines()
+        self.assertIn("vendor/lib64/libformatter.so:vendor/lib64/libformatter_mtk.so;FIX_SONAME", blobs)
+        self.assertIn("vendor/lib64/mt6878/libmnl.so:vendor/lib64/libmnl_mtk.so;FIX_SONAME", blobs)
+        fixups = (ROOT / "extract-files.py").read_text()
+        self.assertIn("('vendor/lib64/libcodec2_mtk_vdec.so', 'vendor/lib64/libcodec2_mtk_venc.so'): blob_fixup()\n"
+                      "        .replace_needed('libformatter.so', 'libformatter_mtk.so')", fixups)
+        self.assertIn("'vendor/bin/mnld': blob_fixup()\n"
+                      "        .replace_needed('libmnl.so', 'libmnl_mtk.so')", fixups)
+
+    def test_manifest_projects_use_the_lineage_24_branches(self):
+        root = ET.parse(ROOT / "manifests/malachite.xml").getroot()
+        for project in root.findall("project"):
+            self.assertEqual(project.get("remote"), "malachite-project", project.get("path"))
+            self.assertEqual(project.get("revision"), "lineage-24.0", project.get("path"))
 
     def test_offloaded_bluetooth_modules_have_software_a2dp(self):
         # PCM-only A2DP ports catch codecs the DSP does not encode (empty encodedFormats

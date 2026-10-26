@@ -222,6 +222,14 @@ blob_fixups: blob_fixups_user_type = {
 
     'vendor/lib64/libpqconfig.so': blob_fixup()
         .replace_needed('android.hardware.sensors-V2-ndk.so', 'android.hardware.sensors-V3-ndk.so'),
+
+    # Android 17 adds external/libmnl (netlink). LineageOS devices also rename
+    # libformatter on lineage-24.0, against a Car library of that name.
+    ('vendor/lib64/libcodec2_mtk_vdec.so', 'vendor/lib64/libcodec2_mtk_venc.so'): blob_fixup()
+        .replace_needed('libformatter.so', 'libformatter_mtk.so'),
+
+    'vendor/bin/mnld': blob_fixup()
+        .replace_needed('libmnl.so', 'libmnl_mtk.so'),
 }  # fmt: skip
 
 module = ExtractUtilsModule(

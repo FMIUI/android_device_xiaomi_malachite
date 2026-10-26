@@ -3,7 +3,7 @@ on:
   push:
     branches: [revival/prebuild-safety-20260906]
   pull_request:
-    branches: [lineage-23.2]
+    branches: [lineage-24.0]
 permissions:
   contents: read
 jobs:

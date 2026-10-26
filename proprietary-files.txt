@@ -1404,7 +1404,7 @@ vendor/lib64/hw/gps.default.so
 vendor/lib64/hw/mtkgeofence.default.so
 vendor/lib64/hw/vendor.mediatek.hardware.gnss-impl.so
 vendor/lib64/mt6878/libDR.so:vendor/lib64/libDR.so
-vendor/lib64/mt6878/libmnl.so:vendor/lib64/libmnl.so
+vendor/lib64/mt6878/libmnl.so:vendor/lib64/libmnl_mtk.so;FIX_SONAME
 vendor/lib64/vendor.mediatek.hardware.gnss-V1-ndk.so
 
 # GNSS (Configs)
@@ -1519,7 +1519,7 @@ vendor/lib64/libcodec2_vpp_fa_plugin.so
 vendor/lib64/libcodec2_vpp_mi_plugin.so
 vendor/lib64/libcodec2_vpp_qt_plugin.so
 vendor/lib64/libcodec2_vpp_rs_plugin.so
-vendor/lib64/libformatter.so
+vendor/lib64/libformatter.so:vendor/lib64/libformatter_mtk.so;FIX_SONAME
 
 # Media (Dolby)
 # Decoders behind android.hardware.media.c2-dolby-service (dolby/codec2), which

@@ -35,7 +35,10 @@ native bridges.
 ## Camera buffer compatibility
 
 Lineage's Android 16 `GraphicBuffer` includes `DependencyMonitor` and occupies
-`0xd30` bytes. The OS3 Xiaomi gralloc helper and the image/video filter plugins
+`0xd30` bytes. lineage-24.0 (Android 17) only adds the non-virtual
+`getSmpte2094_50()` to the class; its members, bases and `DependencyMonitor`
+are unchanged, so the size is still `0xd30` (header comparison, not a
+measured `sizeof`). The OS3 Xiaomi gralloc helper and the image/video filter plugins
 allocate only `0x100` bytes before calling its constructor. This overwrites
 adjacent objects during still capture. The resulting crashes can appear in
 metadata, buffer cleanup, mutex destruction, or later callbacks.

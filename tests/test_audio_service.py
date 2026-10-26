@@ -66,6 +66,31 @@ class AudioServiceTests(unittest.TestCase):
         self.assertEqual(hals[0].findtext("version"), "3")
         self.assertEqual(hals[0].findtext("fqname"), "IBluetoothAudioProviderFactory/default")
 
+    def test_provider_service_label_comes_from_sepolicy_vndr(self):
+        # lineage-24.0's sepolicy_vndr labels the provider hal_audio_service. A second,
+        # different label here makes the merged vendor service_contexts fail
+        # ("Multiple different specifications").
+        service = "vendor.mediatek.hardware.bluetooth.audio.IBluetoothAudioProviderFactory/default"
+        self.assertNotIn(service, (ROOT / "sepolicy/vendor/service_contexts").read_text())
+        policy = ROOT.parent / "device_mediatek_sepolicy_vndr" / "base" / "vendor"
+        if not policy.is_dir():
+            self.skipTest("device_mediatek_sepolicy_vndr is not checked out beside the tree")
+        self.assertRegex((policy / "service_contexts").read_text(),
+                         service.replace(".", r"\.") + r"\s+u:object_r:hal_audio_service:s0")
+
+    def test_no_genfs_path_is_labeled_twice(self):
+        # Duplicate genfscon entries are a checkpolicy error, even with the same label.
+        policy = ROOT.parent / "device_mediatek_sepolicy_vndr" / "base" / "vendor"
+        if not policy.is_dir():
+            self.skipTest("device_mediatek_sepolicy_vndr is not checked out beside the tree")
+
+        def paths(path):
+            return {tuple(line.split()[1:3]) for line in path.read_text().splitlines()
+                    if line.startswith("genfscon")}
+
+        self.assertEqual(paths(ROOT / "sepolicy/vendor/genfs_contexts") &
+                         paths(policy / "genfs_contexts"), set())
+
 
 if __name__ == "__main__":
     unittest.main()

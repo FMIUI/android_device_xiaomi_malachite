@@ -236,6 +236,13 @@ blob_fixups: blob_fixups_user_type = {
 
     'vendor/bin/mnld': blob_fixup()
         .replace_needed('libmnl.so', 'libmnl_mtk.so'),
+
+    # Android 17 dropped android.frameworks.displayservice; surfaceflinger serves
+    # it as lineage.frameworks.displayservice (register_displayservice). The
+    # camera blobs keep stock's client library and its C++ symbols; only its
+    # interface names change (same length), not its file name.
+    'vendor/lib64/android.frameworks.displayservice@1.0.so': blob_fixup()
+        .binary_regex_replace(rb'android(\.frameworks\.displayservice@1\.0(?:::|\x00))', rb'lineage\1'),
 }  # fmt: skip
 
 module = ExtractUtilsModule(

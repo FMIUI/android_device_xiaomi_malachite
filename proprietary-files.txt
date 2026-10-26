@@ -1347,6 +1347,9 @@ vendor/lib64/vendor.xiaomi.hardware.bgservice@1.0-impl.so
 vendor/lib64/vendor.xiaomi.hardware.bgservice@1.0.so
 vendor/lib64/vendor.xiaomi.hardware.quickcamera-V1-ndk.so
 
+# Camera (IDisplayService client for the camera HAL; no Android 17 source module)
+vendor/lib64/android.frameworks.displayservice@1.0.so
+
 # Camera (MiuiCamera)
 # APK and JNI bridges: malachite OS3.0.10.0.WOOMIXM, matching vendor.
 product/priv-app/MiuiCamera/MiuiCamera.apk

@@ -123,6 +123,10 @@ PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,$(DEVICE_PATH)/marketname/,$(TARGET_COPY_OUT_PRODUCT)/etc/marketname)
 
 # Camera
+# Stock camera blobs use IDisplayService, which Android 17 removed; surfaceflinger
+# registers LineageOS's copy (lineage.frameworks.displayservice) instead.
+$(call soong_config_set_bool,surfaceflinger,register_displayservice,true)
+
 PRODUCT_PACKAGES += \
     MalachiteQrResult \
     miui-cameraopt

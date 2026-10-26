@@ -1,0 +1,2 @@
+# surfaceflinger (register_displayservice), for the stock camera blobs
+lineage.frameworks.displayservice::IDisplayService u:object_r:fwk_display_hwservice:s0

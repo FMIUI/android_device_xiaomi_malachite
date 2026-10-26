@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// Serves one of stock's Dolby Codec2 stores as AIDL IComponentStore/<instance>.
+// Serves one of stock's Dolby Codec2 stores as IComponentStore/<instance>,
+// over AIDL or HIDL (@1.2) following media.c2.hal.selection like the
+// MediaTek store.
 // Usage: android.hardware.media.c2-dolby-service <store library> <instance>
 
 #define LOG_TAG "android.hardware.media.c2-dolby-service"
@@ -12,6 +14,8 @@
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
 #include <codec2/aidl/ComponentStore.h>
+#include <codec2/aidl/ParamTypes.h>
+#include <codec2/hidl/1.2/ComponentStore.h>
 #include <hidl/HidlTransportSupport.h>
 
 #include <dlfcn.h>
@@ -39,6 +43,7 @@ int main(int argc, char** argv) {
     }
     const char* library = argv[1];
     const std::string instance = argv[2];
+    const bool aidlSelected = ::aidl::android::hardware::media::c2::utils::IsSelected();
 
     signal(SIGPIPE, SIG_IGN);
 
@@ -54,7 +59,8 @@ int main(int argc, char** argv) {
     }
 
     // The Dolby Vision decoder drives the hardware HEVC decoder through a HIDL
-    // Codec2 client, whose listener callbacks arrive over hwbinder.
+    // Codec2 client, whose listener callbacks arrive over hwbinder. With the
+    // HIDL selection this pool also serves the store itself.
     std::thread([] {
         android::hardware::configureRpcThreadpool(kThreadCount, true /* callerWillJoin */);
         android::hardware::joinRpcThreadpool();
@@ -63,21 +69,34 @@ int main(int argc, char** argv) {
     ABinderProcess_setThreadPoolMaxThreadCount(kThreadCount);
     ABinderProcess_startThreadPool();
 
-    using namespace ::aidl::android::hardware::media::c2;
     std::shared_ptr<C2ComponentStore> c2Store = getStore();
     if (c2Store == nullptr) {
         LOG(ERROR) << "Cannot create the Codec2 store from " << library;
         return 1;
     }
-    std::shared_ptr<IComponentStore> store =
-            ::ndk::SharedRefBase::make<utils::ComponentStore>(c2Store);
 
-    const std::string serviceName = std::string(IComponentStore::descriptor) + "/" + instance;
-    if (AServiceManager_addService(store->asBinder().get(), serviceName.c_str()) != EX_NONE) {
-        LOG(ERROR) << "Cannot register " << serviceName;
-        return 1;
+    if (aidlSelected) {
+        using namespace ::aidl::android::hardware::media::c2;
+        std::shared_ptr<IComponentStore> store =
+                ::ndk::SharedRefBase::make<utils::ComponentStore>(c2Store);
+
+        const std::string serviceName =
+                std::string(IComponentStore::descriptor) + "/" + instance;
+        if (AServiceManager_addService(store->asBinder().get(), serviceName.c_str()) !=
+            EX_NONE) {
+            LOG(ERROR) << "Cannot register " << serviceName;
+            return 1;
+        }
+        LOG(INFO) << "Registered " << serviceName << " from " << library;
+    } else {
+        using namespace ::android::hardware::media::c2::V1_2;
+        ::android::sp<IComponentStore> store = new utils::ComponentStore(c2Store);
+        if (store->registerAsService(instance) != ::android::OK) {
+            LOG(ERROR) << "Cannot register HIDL IComponentStore/" << instance;
+            return 1;
+        }
+        LOG(INFO) << "Registered HIDL IComponentStore@1.2/" << instance << " from " << library;
     }
-    LOG(INFO) << "Registered " << serviceName << " from " << library;
 
     ABinderProcess_joinThreadPool();
     return 1;

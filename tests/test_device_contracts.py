@@ -135,6 +135,16 @@ class DeviceContracts(unittest.TestCase):
         # 0x10d, expert wide colour, shows only a faint red without Xiaomi's display service.
         self.assertNotIn("269", modes)
 
+    def test_lcd_density_matches_density_mapping(self):
+        # Without ro.sf.lcd_density, DENSITY_DEVICE_STABLE is 160 and Play installs mdpi
+        # resource splits, so app images are upscaled 3x.
+        board = re.search(r"(?m)^TARGET_SCREEN_DENSITY := (\d+)$",
+                          (ROOT / "BoardConfig.mk").read_text())
+        self.assertIsNotNone(board)
+        mapping = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
+        densities = [d.text for d in mapping.iter("density") if d.text and d.text.strip().isdigit()]
+        self.assertEqual(densities, [board.group(1)])
+
     def test_hdr_headroom_is_the_calibrated_curve(self):
         hbm = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot().find(
             "highBrightnessMode")
@@ -163,11 +173,13 @@ class DeviceContracts(unittest.TestCase):
         # (min_brightness 1, max_brightness 20479), and the panel takes it as is.
         props = (ROOT / "vendor.prop").read_text()
         self.assertRegex(props, r"(?m)^ro\.vendor\.mtk_backlight_hwc_support=1$")
-        # Sync backlight mode (led_type 1) leaves the panel without a writer on this ROM.
-        self.assertRegex(props, r"(?m)^vendor\.debug\.hwc\.plat_switch_clear_bit=15$")
-        # init drops vendor.prop lines vendor_init may not set, without failing the boot.
-        self.assertIn("set_prop(vendor_init, vendor_mtk_hwc_debug_log_prop)",
-                      (ROOT / "sepolicy/vendor/vendor_init.te").read_text())
+        # The composer keeps its sync backlight mode (level written after the frame), but
+        # led_type must stay 0: the prebuilt kernel never applies the sync level (CSC_BL).
+        self.assertNotIn("plat_switch_clear_bit", props)
+        rc = (ROOT / "init/init.mt6878.rc").read_text()
+        self.assertIn("chmod 0444 /sys/class/leds/lcd-backlight/led_type", rc)
+        self.assertIn("chown root root /sys/class/leds/lcd-backlight/led_type", rc)
+        self.assertNotIn("chown system system /sys/class/leds/lcd-backlight/led_type", rc)
         display = ET.parse(ROOT / "configs/display_id_4627039422300187648.xml").getroot()
         points = [(float(p.find("value").text), float(p.find("nits").text))
                   for p in display.find("screenBrightnessMap").iter("point")]
@@ -213,6 +225,17 @@ class DeviceContracts(unittest.TestCase):
         self.assertAlmostEqual(dimens["config_screenBrightnessSettingDefaultFloat"],
                                brightness_at(75), delta=0.002)
 
+    def test_brightness_ramp_durations_match_stock(self):
+        # Stock framework-ext-res config_animation_duration_{hdr_brightness,manual_dimming,
+        # manual_brightness,dim}; the window override uses stock's manual duration.
+        config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
+        integers = {node.get("name"): int(node.text) for node in config.getroot().iter("integer")}
+        self.assertEqual(integers["config_brightnessRampHdrDurationMillis"], 4000)
+        self.assertEqual(integers["config_brightnessRampTemporaryDurationMillis"], 500)
+        self.assertEqual(integers["config_brightnessRampManualDurationMillis"], 800)
+        self.assertEqual(integers["config_brightnessRampOverrideDurationMillis"], 800)
+        self.assertEqual(integers["config_brightnessRampDimDurationMillis"], 1200)
+
     def test_low_brightness_keeps_one_refresh_rate(self):
         overlay = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
         root = overlay.getroot()
@@ -234,6 +257,16 @@ class DeviceContracts(unittest.TestCase):
         bools = {node.get("name"): node.text for node in settings.iter("bool")}
         self.assertEqual(bools["config_show_min_refresh_rate_switch"], "true")
         self.assertEqual(bools["config_show_peak_refresh_rate_switch"], "true")
+
+    def test_lmkd_uses_zram_before_killing(self):
+        # lmkd's swap_is_low is free swap (capped by easily available memory)
+        # below this share of total swap; it gates the LOW_MEM_AND_SWAP and
+        # LOW_SWAP_AND_THRASHING kills, which go below the LOW_MEM fallback's
+        # previous-app floor. 100 makes swap permanently "low".
+        props = dict(line.split("=", 1) for line in
+                     (ROOT / "vendor.prop").read_text().splitlines()
+                     if line.startswith("ro.lmk."))
+        self.assertLessEqual(int(props.get("ro.lmk.swap_free_low_percentage", "10")), 20)
 
     def test_headset_detection_uses_input_events(self):
         config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
@@ -370,6 +403,38 @@ class DeviceContracts(unittest.TestCase):
             for sink in A2DP_SINKS:
                 with self.subTest(file=name, sink=sink):
                     self.assertEqual(routes[sink], ["a2dp output"])
+
+    def test_le_audio_offload_capabilities_are_installed(self):
+        # MediaTek's provider reads LE Audio offload capabilities only from
+        # /vendor/etc/le_audio_codec_capabilities.xml (configs/audio is copied to
+        # vendor/etc). With no file the stack has no offload configuration at all.
+        device = (ROOT / "device.mk").read_text()
+        self.assertIn("$(call find-copy-subdir-files,*,$(DEVICE_PATH)/configs/audio/,"
+                      "$(TARGET_COPY_OUT_VENDOR)/etc)", device)
+        setting = ET.parse(ROOT / "configs/audio/le_audio_codec_capabilities.xml").getroot()
+        self.assertEqual(setting.tag, "leAudioOffloadSetting")
+        codecs = {node.get("name"): node for node in setting.iter("codecConfiguration")}
+        strategies = {node.get("name"): node for node in setting.iter("strategyConfiguration")}
+        configurations = {node.get("name"): node for node in setting.iter("configuration")}
+        for name, node in configurations.items():
+            with self.subTest(configuration=name):
+                self.assertIn(node.get("codecConfiguration"), codecs)
+                self.assertIn(node.get("strategyConfiguration"), strategies)
+        for scenario in setting.iter("scenario"):
+            for key in ("encode", "decode", "broadcast"):
+                value = scenario.get(key)
+                if value not in (None, "invalid"):
+                    self.assertIn(value, configurations)
+        for name, node in codecs.items():
+            self.assertEqual(node.get("codec"), "LC3", name)
+        for node in strategies.values():
+            self.assertIsNone(node.get("audioChannelAllocation"))
+        # BAP 48_4 (48 kHz, 10 ms, 120 octets) for two earbuds, one CIS each.
+        self.assertIn(("48000", "10000", "120"),
+                      {(c.get("samplingFrequency"), c.get("frameDurationUs"),
+                        c.get("octetsPerCodecFrame")) for c in codecs.values()})
+        encode = {scenario.get("encode") for scenario in setting.iter("scenario")}
+        self.assertIn("OneChanStereo_48_4", encode)
 
     def test_policy_file_follows_the_offload_switches(self):
         # system/media audio_config.h, with ro.bluetooth.a2dp_offload.supported=true:
@@ -574,6 +639,11 @@ class DeviceContracts(unittest.TestCase):
                  if "BLE" in port.get("type")}
         self.assertEqual({tag: (port.get("type"), port.get("role"))
                           for tag, port in ports.items()}, BLE_OFFLOAD_PORTS)
+        # AudioPolicyManager::getHwOffloadFormatsSupportedForBluetoothMedia reads the
+        # primary module's BLE encodedFormats; codec_manager.cc offloads no configuration
+        # whose codec is missing from that list.
+        for tag, port in ports.items():
+            self.assertEqual(port.get("encodedFormats"), "AUDIO_FORMAT_LC3", tag)
         for tag, port in ports.items():
             mask = "AUDIO_CHANNEL_IN_MONO" if port.get("role") == "source" \
                 else "AUDIO_CHANNEL_OUT_MONO"
@@ -674,6 +744,12 @@ class DeviceContracts(unittest.TestCase):
         node = "/sys/devices/platform/goodix_ts.0/goodix_ts_report_rate"
         self.assertIn("vendor.lineage.touch-service.malachite", (ROOT / "device.mk").read_text())
         self.assertIn(node, (ROOT / "touch/HighTouchPollingRate.cpp").read_text())
+        hal = (ROOT / "touch/HighTouchPollingRate.cpp").read_text()
+        # Stock's 480 Hz: Touch_Game_Mode (0) = 1 through /dev/xiaomi-touch -> GT9916R 0xC1.
+        self.assertIn('"/dev/xiaomi-touch"', hal)
+        self.assertIn("kTouchGameMode = 0", hal)
+        self.assertIn("allow hal_lineage_touch_default vendor_touchfeature_device:chr_file",
+                      (ROOT / "sepolicy/vendor/hal_lineage_touch_default.te").read_text())
         rc = (ROOT / "touch/vendor.lineage.touch-service.malachite.rc").read_text()
         self.assertIn("chown system system " + node, rc)
         self.assertIn("genfscon sysfs " + node[len("/sys"):] +
@@ -737,3 +813,13 @@ class DeviceContracts(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LibladderStubTests(unittest.TestCase):
+    def test_stock_libladder_is_replaced_by_the_stub(self):
+        # hardware/mediatek/libaedv provides LineageOS's libladder stub; stock's copy must
+        # not be extracted next to it (duplicate module) and the stub must be installed.
+        blobs = (ROOT / "proprietary-files.txt").read_text().splitlines()
+        self.assertFalse([b for b in blobs if "libladder" in b])
+        self.assertRegex((ROOT / "device.mk").read_text(),
+                         r"PRODUCT_PACKAGES \+= \\\n    libladder\n")

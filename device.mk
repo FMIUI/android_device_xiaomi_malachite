@@ -454,7 +454,7 @@ include $(DEVICE_PATH)/vendor_logtag.mk
 
 # Radio
 PRODUCT_PACKAGES += \
-    vendor_mdota_symlink
+    mdota_symlink
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.telephony.gsm.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.telephony.gsm.xml \
@@ -500,6 +500,13 @@ PRODUCT_PACKAGES += \
     android.hardware.usb-service.mediatek \
     android.hardware.usb.gadget-service.mediatek
 
+# Our stock-derived init.mt6878.usb.rc (init/), not hardware/mediatek's common one.
+$(call soong_config_set_bool,mediatek_gadget,use_custom_usb_gadget_rc,true)
+
+# Xiaomi's wlan_assistant (vendor blob) loads the region's Wi-Fi NVRAM by board id;
+# hardware/mediatek's own one doesn't.
+$(call soong_config_set_bool,mediatek_wlan,use_vendor_wlan_assistant,true)
+
 PRODUCT_PACKAGES += \
     init.mt6878.usb.rc
 
@@ -523,6 +530,11 @@ PRODUCT_COPY_FILES += \
 # The shipped MTK driver ignores NL80211_WPA_VERSION_3. Use its existing
 # RSN/SAE path without changing authentication or protected management frames.
 $(call soong_config_set_bool,wpa_supplicant_8,wifi_disable_wpa_version_3,true)
+
+# libwifi-hal-mtk.so fills the function table in its pre-Android 14 QPR2 layout.
+# Without this the wrapper copies it with the newer layout and every call after
+# the RTT entries lands on the wrong vendor function.
+$(call soong_config_set_bool,mediatek_wifi_hal,use_pre_u_qpr2_struct,true)
 
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \

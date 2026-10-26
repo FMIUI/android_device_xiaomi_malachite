@@ -83,6 +83,10 @@ lib_fixups: lib_fixups_user_type = {
         'libneuron_graph_delegate.mtk',
         'libtflite_mtk',
         'vendor.mediatek.hardware.apuware.utils-V1-ndk',
+        # hardware/mediatek builds this interface from source on lineage-24.0;
+        # stock's V1 matches none of its frozen versions, so the stock audio
+        # HALs keep their own copy (same file name, _vendor module name).
+        'vendor.mediatek.hardware.bluetooth.audio-V1-ndk',
     ): lib_fixup_vendor_suffix,
 }
 

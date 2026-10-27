@@ -41,11 +41,12 @@ The build puts the record in the ROM, so nothing extra has to be published:
 
 ```
 adb shell getprop ro.malachite.source.id            # src-<12 hex digits>
-adb shell cat /product/etc/malachite-source.xml     # every project and commit
+adb shell cat /system_ext/etc/source/manifest.xml  # every project and commit
 ```
 
-Anyone can sync that exact tree from the file: copy it to `.repo/manifests/`, then
-`repo init -m malachite-source.xml` and `repo sync`. The ID ends in `-untraceable` if
+Both can be read from adb shell and appear in bug reports; apps can't read them.
+Anyone can sync that exact tree from the file: pull it, copy it to `.repo/manifests/`,
+then `repo init -m manifest.xml` and `repo sync`. The ID ends in `-untraceable` if
 something was uncommitted or unpushed, `-stale` if the device, vendor or kernel tree
 changed after the snapshot, and is `none` if no snapshot was taken.
 

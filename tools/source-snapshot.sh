@@ -10,7 +10,7 @@
 #
 # Run it from the top of the tree after syncing and applying any patches, right before
 # building. The build then puts the result in the ROM as
-# /product/etc/malachite-source.xml and its hash in ro.malachite.source.id.
+# /system_ext/etc/source/manifest.xml and its hash in ro.malachite.source.id.
 #
 #   bash device/xiaomi/malachite/tools/source-snapshot.sh [-o <file>]
 

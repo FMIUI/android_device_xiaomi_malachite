@@ -22,19 +22,26 @@ Kernel sources are built separately; see
 
 ## Source ID
 
-Every build made from these trees, whatever the ROM, records the device, vendor and
-kernel tree commits it was built from:
+Every build made from these trees, whatever the ROM and whether it uses these
+repositories or forks of them, records where its device, vendor and kernel trees came
+from:
 
 ```
-adb shell getprop ro.malachite.source
-device:d5e9647,vendor:7e73953,kernel:a9522e4
+adb shell getprop | grep malachite.source
+[ro.malachite.source.device]: [malachite-project/android_device_xiaomi_malachite@a917ca0]
+[ro.malachite.source.kernel]: [malachite-project/android_device_xiaomi_malachite-kernel@a9522e4]
+[ro.malachite.source.vendor]: [malachite-project/android_vendor_xiaomi_malachite@7e73953]
 ```
 
-Each hash is a commit in the matching malachite-project repository. `-dirty` after a
-hash means that tree had uncommitted changes when it was built; `unknown` means the
-tree was not a git checkout. Nothing has to be done to get it: keep the trees as git
-checkouts and sync them as usual. When you release a build, put this line in your
-changelog; when you report a bug, include it.
+Each value is the repository the tree was synced from (or pushed to) and the commit
+that was built. Nothing has to be done to get it; for a build anyone can trace:
+
+- keep the trees as git checkouts (repo sync or git clone, not copies);
+- commit your changes and push them before building. `-dirty` means the tree had
+  uncommitted changes, `-unpublished` that the commit was on no remote branch, and
+  then nobody else can get that exact source.
+
+Put the three lines in your release notes and in bug reports.
 
 ## Credits
 

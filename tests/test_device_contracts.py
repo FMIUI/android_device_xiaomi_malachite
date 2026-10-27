@@ -825,23 +825,76 @@ class SourceIdTests(unittest.TestCase):
         return subprocess.run(self.GIT + ["-C", str(path), *args], check=True, text=True,
                               capture_output=True).stdout.strip()
 
-    def commit_tree(self, path, name="file"):
+    def commit(self, path, name="file"):
         path.mkdir(parents=True, exist_ok=True)
-        (path / name).write_text("a\n")
-        self.git(path, "init", "-q")
+        if not (path / ".git").exists():
+            self.git(path, "init", "-q")
+        (path / name).write_text(f"{name} {len(list(path.iterdir()))}\n")
         self.git(path, "add", "-A")
         self.git(path, "commit", "-q", "-m", "c")
-        self.git(path, "tag", "release-1")
         return self.git(path, "rev-parse", "--short=7", "HEAD")
 
-    def source_id(self, setup):
+    def publish(self, path, remote, url, branch="lineage"):
+        self.git(path, "remote", "add", remote, url)
+        self.git(path, "update-ref", f"refs/remotes/{remote}/{branch}", "HEAD")
+
+    def source_id(self, tree):
+        return subprocess.run(["bash", str(ROOT / "tools/source-id.sh"), str(tree)], check=True,
+                              text=True, capture_output=True, timeout=20).stdout.strip()
+
+    def test_published_commit_names_its_repository(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            tree = Path(temporary) / "tree"
+            head = self.commit(tree)
+            self.git(tree, "tag", "release-1")
+            self.publish(tree, "upstream", "https://github.com/malachite-project/android_x")
+            # A fork is named, and credentials in the remote URL never show.
+            self.publish(tree, "zfork", "https://user:token@github.com/someone/android_x.git")
+            self.git(tree, "symbolic-ref", "refs/remotes/m/lineage",
+                     "refs/remotes/upstream/lineage")
+            self.assertEqual(self.source_id(tree), f"malachite-project/android_x@{head}")
+
+    def test_fork_remotes_in_other_forms(self):
+        for url, repository in (("git@github.com:someone/android_x.git", "someone/android_x"),
+                                ("ssh://git@gitlab.com/someone/android_x", "gitlab.com/someone/android_x"),
+                                ("/home/someone/mirror/android_x", "local")):
+            with self.subTest(url=url), tempfile.TemporaryDirectory() as temporary:
+                tree = Path(temporary) / "tree"
+                head = self.commit(tree)
+                self.publish(tree, "fork", url)
+                self.assertEqual(self.source_id(tree), f"{repository}@{head}")
+
+    def test_unpublished_and_dirty_trees_are_marked(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            tree = Path(temporary) / "tree"
+            self.commit(tree)
+            self.publish(tree, "origin", "https://github.com/someone/android_x")
+            head = self.commit(tree, "local-change")
+            self.assertEqual(self.source_id(tree), f"someone/android_x@{head}-unpublished")
+            (tree / "file").write_text("edited\n")
+            self.assertEqual(self.source_id(tree),
+                             f"someone/android_x@{head}-dirty-unpublished")
+
+    def test_trees_without_their_own_checkout_are_unknown(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            self.assertEqual(self.source_id(work / "missing"), "unknown")
+            self.commit(work)
+            (work / "plain").mkdir()
+            self.assertEqual(self.source_id(work / "plain"), "unknown")
+            head = self.commit(work / "own")
+            self.assertEqual(self.source_id(work / "own"), f"none@{head}-unpublished")
+
+    def test_device_mk_sets_one_property_per_tree(self):
         with tempfile.TemporaryDirectory(prefix="malachite-source-id-") as temporary:
             work = Path(temporary)
             device = work / "device/xiaomi/malachite"
-            device.mkdir(parents=True)
-            shutil.copyfile(ROOT / "device.mk", device / "device.mk")
-            shutil.copyfile(ROOT / "vendor_logtag.mk", device / "vendor_logtag.mk")
-            expected = setup(work)
+            (device / "tools").mkdir(parents=True)
+            for name in ("device.mk", "vendor_logtag.mk", "tools/source-id.sh"):
+                shutil.copyfile(ROOT / name, device / name)
+            device_head = self.commit(device)
+            self.publish(device, "github", "https://github.com/someone/android_device_x")
+            vendor_head = self.commit(work / "vendor/xiaomi/malachite")
             (work / "harness.mk").write_text(
                 "PRODUCT_PRODUCT_PROPERTIES :=\n"
                 "TARGET_COPY_OUT_PRODUCT := product\n"
@@ -854,27 +907,12 @@ class SourceIdTests(unittest.TestCase):
             run = subprocess.run(["make", "--no-print-directory", "-f", "harness.mk", "print-props"],
                                  cwd=work, check=True, text=True, capture_output=True, timeout=20,
                                  env=dict(os.environ, MAKEFLAGS="", MAKEFILES=""))
-            props = [p for p in run.stdout.split() if p.startswith("ro.malachite.source=")]
-            self.assertEqual(len(props), 1, run.stdout)
-            return props[0].split("=", 1)[1], expected
-
-    def test_clean_trees_give_their_commits(self):
-        def setup(work):
-            device = work / "device/xiaomi/malachite"
-            return (f"device:{self.commit_tree(device, 'README')},"
-                    f"vendor:{self.commit_tree(work / 'vendor/xiaomi/malachite')},"
-                    f"kernel:{self.commit_tree(work / 'device/xiaomi/malachite-kernel')}")
-        actual, expected = self.source_id(setup)
-        self.assertEqual(actual, expected)
-
-    def test_local_changes_and_missing_trees(self):
-        def setup(work):
-            device = self.commit_tree(work / "device/xiaomi/malachite", "README")
-            vendor = self.commit_tree(work / "vendor/xiaomi/malachite")
-            (work / "vendor/xiaomi/malachite/file").write_text("b\n")
-            return f"device:{device},vendor:{vendor}-dirty,kernel:unknown"
-        actual, expected = self.source_id(setup)
-        self.assertEqual(actual, expected)
+            props = [p for p in run.stdout.split() if p.startswith("ro.malachite.source")]
+            self.assertEqual(props, [
+                f"ro.malachite.source.device=someone/android_device_x@{device_head}",
+                f"ro.malachite.source.vendor=none@{vendor_head}-unpublished",
+                "ro.malachite.source.kernel=unknown",
+            ])
 
 
 class LibladderStubTests(unittest.TestCase):

@@ -885,34 +885,100 @@ class SourceIdTests(unittest.TestCase):
             head = self.commit(work / "own")
             self.assertEqual(self.source_id(work / "own"), f"none@{head}-unpublished")
 
-    def test_device_mk_sets_one_property_per_tree(self):
+    def snapshot_id(self, snapshot, *trees):
+        return subprocess.run(["bash", str(ROOT / "tools/source-id.sh"), "--snapshot-id",
+                               str(snapshot), *map(str, trees)], check=True, text=True,
+                              capture_output=True, timeout=20).stdout.strip()
+
+    def write_snapshot(self, path, revisions, untraceable=False):
+        projects = "".join(f'  <project name="android_{tree.name}" path="{tree}" '
+                           f'revision="{revision}" upstream="lineage-23.2"/>\n'
+                           for tree, revision in revisions.items())
+        state = ("  <!-- malachite-source: untraceable\n       art uncommitted\n  -->\n"
+                 if untraceable else
+                 "  <!-- malachite-source: every project is at a published commit -->\n")
+        path.write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n<manifest>\n'
+                        f'{projects}{state}</manifest>\n')
+        digest = subprocess.run(["sha256sum", str(path)], check=True, text=True,
+                                capture_output=True).stdout[:12]
+        return f"src-{digest}"
+
+    def test_snapshot_id(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            work = Path(temporary)
+            tree = work / "tree"
+            self.commit(tree)
+            full = self.git(tree, "rev-parse", "HEAD")
+            snapshot = work / "source-manifest.xml"
+            self.assertEqual(self.snapshot_id(snapshot, tree), "none")
+            digest = self.write_snapshot(snapshot, {tree: full})
+            self.assertEqual(self.snapshot_id(snapshot, tree, work / "missing"), digest)
+            self.commit(tree, "later")
+            self.assertEqual(self.snapshot_id(snapshot, tree), f"{digest}-stale")
+            digest = self.write_snapshot(snapshot, {tree: self.git(tree, "rev-parse", "HEAD")},
+                                         untraceable=True)
+            self.assertEqual(self.snapshot_id(snapshot, tree), f"{digest}-untraceable")
+
+    def device_mk(self, setup):
         with tempfile.TemporaryDirectory(prefix="malachite-source-id-") as temporary:
             work = Path(temporary)
             device = work / "device/xiaomi/malachite"
             (device / "tools").mkdir(parents=True)
             for name in ("device.mk", "vendor_logtag.mk", "tools/source-id.sh"):
                 shutil.copyfile(ROOT / name, device / name)
-            device_head = self.commit(device)
-            self.publish(device, "github", "https://github.com/someone/android_device_x")
-            vendor_head = self.commit(work / "vendor/xiaomi/malachite")
+            expected = setup(work, device)
             (work / "harness.mk").write_text(
                 "PRODUCT_PRODUCT_PROPERTIES :=\n"
+                "PRODUCT_COPY_FILES :=\n"
                 "TARGET_COPY_OUT_PRODUCT := product\n"
                 "TARGET_COPY_OUT_VENDOR := vendor\n"
                 "TARGET_COPY_OUT_ODM := odm\n"
                 "include device/xiaomi/malachite/device.mk\n"
-                ".PHONY: print-props\n"
-                "print-props:\n\t@printf '%s\\n' $(PRODUCT_PRODUCT_PROPERTIES)\n"
+                ".PHONY: print\n"
+                "print:\n\t@printf '%s\\n' $(PRODUCT_PRODUCT_PROPERTIES) $(PRODUCT_COPY_FILES)\n"
             )
-            run = subprocess.run(["make", "--no-print-directory", "-f", "harness.mk", "print-props"],
+            run = subprocess.run(["make", "--no-print-directory", "-f", "harness.mk", "print"],
                                  cwd=work, check=True, text=True, capture_output=True, timeout=20,
                                  env=dict(os.environ, MAKEFLAGS="", MAKEFILES=""))
-            props = [p for p in run.stdout.split() if p.startswith("ro.malachite.source")]
-            self.assertEqual(props, [
+            found = [p for p in run.stdout.split() if "malachite.source" in p
+                     or "malachite-source" in p]
+            return found, expected
+
+    def test_device_mk_without_snapshot(self):
+        def setup(work, device):
+            device_head = self.commit(device)
+            self.publish(device, "github", "https://github.com/someone/android_device_x")
+            vendor_head = self.commit(work / "vendor/xiaomi/malachite")
+            return [
+                "ro.malachite.source.id=none",
                 f"ro.malachite.source.device=someone/android_device_x@{device_head}",
                 f"ro.malachite.source.vendor=none@{vendor_head}-unpublished",
                 "ro.malachite.source.kernel=unknown",
-            ])
+            ]
+        found, expected = self.device_mk(setup)
+        self.assertEqual(found, expected)
+
+    def test_device_mk_with_snapshot(self):
+        def setup(work, device):
+            device_head = self.commit(device)
+            self.publish(device, "github", "https://github.com/someone/android_device_x")
+            (device / "source").mkdir()
+            digest = self.write_snapshot(
+                device / "source/source-manifest.xml",
+                {Path("device/xiaomi/malachite"): self.git(device, "rev-parse", "HEAD")})
+            return [
+                f"ro.malachite.source.id={digest}",
+                f"ro.malachite.source.device=someone/android_device_x@{device_head}",
+                "ro.malachite.source.vendor=unknown",
+                "ro.malachite.source.kernel=unknown",
+                "device/xiaomi/malachite/source/source-manifest.xml:"
+                "product/etc/malachite-source.xml",
+            ]
+        found, expected = self.device_mk(setup)
+        self.assertEqual(found, expected)
+
+    def test_snapshot_directory_is_ignored(self):
+        self.assertIn("/source/", (ROOT / ".gitignore").read_text().splitlines())
 
 
 class LibladderStubTests(unittest.TestCase):

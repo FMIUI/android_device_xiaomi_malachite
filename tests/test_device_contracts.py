@@ -230,7 +230,8 @@ class DeviceContracts(unittest.TestCase):
         # manual_brightness,dim}; the window override uses stock's manual duration.
         config = ET.parse(ROOT / "overlay/FrameworkResOverlayMalachite/res/values/config.xml")
         integers = {node.get("name"): int(node.text) for node in config.getroot().iter("integer")}
-        self.assertEqual(integers["config_brightnessRampHdrDurationMillis"], 4000)
+        # HDR is shorter than stock (4000 ms); testers found 4 s too slow.
+        self.assertEqual(integers["config_brightnessRampHdrDurationMillis"], 900)
         self.assertEqual(integers["config_brightnessRampTemporaryDurationMillis"], 500)
         self.assertEqual(integers["config_brightnessRampManualDurationMillis"], 800)
         self.assertEqual(integers["config_brightnessRampOverrideDurationMillis"], 800)

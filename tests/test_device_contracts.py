@@ -818,6 +818,65 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class SourceIdTests(unittest.TestCase):
+    GIT = ["git", "-c", "user.name=t", "-c", "user.email=t@t", "-c", "init.defaultBranch=main"]
+
+    def git(self, path, *args):
+        return subprocess.run(self.GIT + ["-C", str(path), *args], check=True, text=True,
+                              capture_output=True).stdout.strip()
+
+    def commit_tree(self, path, name="file"):
+        path.mkdir(parents=True, exist_ok=True)
+        (path / name).write_text("a\n")
+        self.git(path, "init", "-q")
+        self.git(path, "add", "-A")
+        self.git(path, "commit", "-q", "-m", "c")
+        self.git(path, "tag", "release-1")
+        return self.git(path, "rev-parse", "--short=7", "HEAD")
+
+    def source_id(self, setup):
+        with tempfile.TemporaryDirectory(prefix="malachite-source-id-") as temporary:
+            work = Path(temporary)
+            device = work / "device/xiaomi/malachite"
+            device.mkdir(parents=True)
+            shutil.copyfile(ROOT / "device.mk", device / "device.mk")
+            shutil.copyfile(ROOT / "vendor_logtag.mk", device / "vendor_logtag.mk")
+            expected = setup(work)
+            (work / "harness.mk").write_text(
+                "PRODUCT_PRODUCT_PROPERTIES :=\n"
+                "TARGET_COPY_OUT_PRODUCT := product\n"
+                "TARGET_COPY_OUT_VENDOR := vendor\n"
+                "TARGET_COPY_OUT_ODM := odm\n"
+                "include device/xiaomi/malachite/device.mk\n"
+                ".PHONY: print-props\n"
+                "print-props:\n\t@printf '%s\\n' $(PRODUCT_PRODUCT_PROPERTIES)\n"
+            )
+            run = subprocess.run(["make", "--no-print-directory", "-f", "harness.mk", "print-props"],
+                                 cwd=work, check=True, text=True, capture_output=True, timeout=20,
+                                 env=dict(os.environ, MAKEFLAGS="", MAKEFILES=""))
+            props = [p for p in run.stdout.split() if p.startswith("ro.malachite.source=")]
+            self.assertEqual(len(props), 1, run.stdout)
+            return props[0].split("=", 1)[1], expected
+
+    def test_clean_trees_give_their_commits(self):
+        def setup(work):
+            device = work / "device/xiaomi/malachite"
+            return (f"device:{self.commit_tree(device, 'README')},"
+                    f"vendor:{self.commit_tree(work / 'vendor/xiaomi/malachite')},"
+                    f"kernel:{self.commit_tree(work / 'device/xiaomi/malachite-kernel')}")
+        actual, expected = self.source_id(setup)
+        self.assertEqual(actual, expected)
+
+    def test_local_changes_and_missing_trees(self):
+        def setup(work):
+            device = self.commit_tree(work / "device/xiaomi/malachite", "README")
+            vendor = self.commit_tree(work / "vendor/xiaomi/malachite")
+            (work / "vendor/xiaomi/malachite/file").write_text("b\n")
+            return f"device:{device},vendor:{vendor}-dirty,kernel:unknown"
+        actual, expected = self.source_id(setup)
+        self.assertEqual(actual, expected)
+
+
 class LibladderStubTests(unittest.TestCase):
     def test_stock_libladder_is_replaced_by_the_stub(self):
         # hardware/mediatek/libaedv provides LineageOS's libladder stub; stock's copy must

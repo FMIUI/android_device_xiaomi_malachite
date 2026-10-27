@@ -30,15 +30,19 @@ echo "Recording the commit of every project..."
 repo manifest -r -o "$tmp/manifest.xml" 2>/dev/null
 
 echo "Checking every project for uncommitted or unpushed changes..."
+# repo warns on stdout above 24 jobs, and only lines naming a project and its state
+# count, so a warning can't mark the tree untraceable.
+jobs=$(nproc)
+[ "$jobs" -le 24 ] || jobs=24
 # shellcheck disable=SC2016
-repo forall -j"$(nproc)" -c '
+repo forall -j"$jobs" -c '
   git update-index -q --refresh >/dev/null 2>&1
   state=
   git diff-index --quiet HEAD -- 2>/dev/null || state=uncommitted
   [ -n "$(git for-each-ref --contains HEAD --count=1 refs/remotes 2>/dev/null)" ] ||
     state="${state:+$state,}unpushed"
   [ -z "$state" ] || echo "$REPO_PATH $state"
-' | sort > "$tmp/state"
+' | grep -E '^[^ ]+ (uncommitted|unpushed|uncommitted,unpushed)$' | sort > "$tmp/state" || true
 
 {
   sed '/<\/manifest>/d' "$tmp/manifest.xml"

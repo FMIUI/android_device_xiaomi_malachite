@@ -20,6 +20,22 @@ LineageOS 24.0 checkout, copy it to `.repo/local_manifests/`, sync, then
 Kernel sources are built separately; see
 [kernel_manifest-6.1](https://github.com/malachite-project/kernel_manifest-6.1).
 
+## Source ID
+
+Every build made from these trees, whatever the ROM, records the device, vendor and
+kernel tree commits it was built from:
+
+```
+adb shell getprop ro.malachite.source
+device:d5e9647,vendor:7e73953,kernel:a9522e4
+```
+
+Each hash is a commit in the matching malachite-project repository. `-dirty` after a
+hash means that tree had uncommitted changes when it was built; `unknown` means the
+tree was not a git checkout. Nothing has to be done to get it: keep the trees as git
+checkouts and sync them as usual. When you release a build, put this line in your
+changelog; when you report a bug, include it.
+
 ## Credits
 
 Built on the work of [mt6878-devs](https://github.com/mt6878-devs),

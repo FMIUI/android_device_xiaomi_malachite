@@ -560,5 +560,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libladder
 
+# Source ID: the device, vendor and kernel tree commits this build was made from, in
+# every ROM built from these trees (adb shell getprop ro.malachite.source). A tree with
+# uncommitted changes gets -dirty; a tree that is missing or not a git checkout, unknown.
+malachite_source_commit = $(shell git -C $(1) describe --always --abbrev=7 --dirty --exclude='*' 2>/dev/null || echo unknown)
+PRODUCT_PRODUCT_PROPERTIES +=     ro.malachite.source=device:$(call malachite_source_commit,$(DEVICE_PATH)),vendor:$(call malachite_source_commit,vendor/xiaomi/malachite),kernel:$(call malachite_source_commit,$(DEVICE_PATH)-kernel)
+
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/malachite/malachite-vendor.mk)

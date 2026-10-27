@@ -928,20 +928,21 @@ class SourceIdTests(unittest.TestCase):
                 shutil.copyfile(ROOT / name, device / name)
             expected = setup(work, device)
             (work / "harness.mk").write_text(
-                "PRODUCT_PRODUCT_PROPERTIES :=\n"
+                "PRODUCT_SYSTEM_EXT_PROPERTIES :=\n"
                 "PRODUCT_COPY_FILES :=\n"
+                "TARGET_COPY_OUT_SYSTEM_EXT := system_ext\n"
                 "TARGET_COPY_OUT_PRODUCT := product\n"
                 "TARGET_COPY_OUT_VENDOR := vendor\n"
                 "TARGET_COPY_OUT_ODM := odm\n"
                 "include device/xiaomi/malachite/device.mk\n"
                 ".PHONY: print\n"
-                "print:\n\t@printf '%s\\n' $(PRODUCT_PRODUCT_PROPERTIES) $(PRODUCT_COPY_FILES)\n"
+                "print:\n\t@printf '%s\\n' $(PRODUCT_SYSTEM_EXT_PROPERTIES) $(PRODUCT_COPY_FILES)\n"
             )
             run = subprocess.run(["make", "--no-print-directory", "-f", "harness.mk", "print"],
                                  cwd=work, check=True, text=True, capture_output=True, timeout=20,
                                  env=dict(os.environ, MAKEFLAGS="", MAKEFILES=""))
             found = [p for p in run.stdout.split() if "malachite.source" in p
-                     or "malachite-source" in p]
+                     or "source-manifest.xml" in p]
             return found, expected
 
     def test_device_mk_without_snapshot(self):
@@ -972,10 +973,28 @@ class SourceIdTests(unittest.TestCase):
                 "ro.malachite.source.vendor=unknown",
                 "ro.malachite.source.kernel=unknown",
                 "device/xiaomi/malachite/source/source-manifest.xml:"
-                "product/etc/malachite-source.xml",
+                "system_ext/etc/source/manifest.xml",
             ]
         found, expected = self.device_mk(setup)
         self.assertEqual(found, expected)
+
+    def test_source_id_is_hidden_from_apps(self):
+        policy = ROOT / "sepolicy/private"
+        te = (policy / "source_id.te").read_text()
+        self.assertIn("system_internal_prop(malachite_source_prop)", te)
+        self.assertIn("get_prop({ shell dumpstate }, malachite_source_prop)", te)
+        rules = [line for line in te.splitlines() if line and not line.startswith("#")]
+        self.assertFalse([line for line in rules if "app" in line], rules)
+        self.assertIn("ro.malachite.source.    u:object_r:malachite_source_prop:s0 prefix string",
+                      (policy / "property_contexts").read_text())
+        self.assertIn("/(system_ext|system/system_ext)/etc/source(/.*)?    "
+                      "u:object_r:malachite_source_file:s0",
+                      (policy / "file_contexts").read_text())
+        device = (ROOT / "device.mk").read_text()
+        start = device.index("# Source ID.")
+        block = device[start:device.index("# Inherit the proprietary files")]
+        self.assertNotIn("PRODUCT_PRODUCT_PROPERTIES", block)
+        self.assertIn("PRODUCT_SYSTEM_EXT_PROPERTIES", block)
 
     def test_snapshot_directory_is_ignored(self):
         self.assertIn("/source/", (ROOT / ".gitignore").read_text().splitlines())

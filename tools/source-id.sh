@@ -12,6 +12,28 @@
 # GitHub, host/path otherwise, "local" for a remote on this machine). -dirty: the tree
 # has uncommitted changes. -unpublished: no remote branch known to the tree contains
 # the commit. "unknown" if the tree is missing or not its own git checkout.
+#
+#   source-id.sh --snapshot-id <source-manifest.xml> <tree>...
+#
+# prints ro.malachite.source.id: src-<hash of the snapshot from source-snapshot.sh>,
+# with -untraceable if it lists uncommitted or unpushed projects and -stale if one of
+# the given trees is no longer at the commit it records; "none" without a snapshot.
+
+if [ "$1" = --snapshot-id ]; then
+  snapshot=$2
+  shift 2
+  [ -f "$snapshot" ] || { echo none; exit 0; }
+  id=src-$(sha256sum "$snapshot" | cut -c1-12)
+  grep -q 'malachite-source: untraceable' "$snapshot" && id=$id-untraceable
+  for tree in "$@"; do
+    recorded=$(grep "path=\"$tree\"" "$snapshot" | head -n 1 |
+      sed -n 's/.* revision="\([0-9a-f]*\)".*/\1/p')
+    [ -n "$recorded" ] || continue
+    [ "$(git -C "$tree" rev-parse HEAD 2>/dev/null)" = "$recorded" ] || { id=$id-stale; break; }
+  done
+  echo "$id"
+  exit 0
+fi
 
 tree=${1:?tree}
 

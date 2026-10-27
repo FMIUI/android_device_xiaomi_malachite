@@ -22,26 +22,39 @@ Kernel sources are built separately; see
 
 ## Source ID
 
-Every build made from these trees, whatever the ROM and whether it uses these
-repositories or forks of them, records where its device, vendor and kernel trees came
-from:
+Every build made from these trees, whatever the ROM, can be traced to its exact
+sources. Rules for builders:
+
+1. Keep every project a git checkout (repo sync or git clone, not copies), and
+   commit and push your changes, patches included, before building.
+2. Right before building, from the top of the ROM tree:
+   ```
+   bash device/xiaomi/malachite/tools/source-snapshot.sh
+   ```
+   It records the commit of every project in the tree and prints the source ID. If it
+   lists projects with uncommitted or unpushed changes, commit and push them and run
+   it again.
+3. Build as usual. Put the source ID in your release notes, and include it in bug
+   reports.
+
+The build puts the record in the ROM, so nothing extra has to be published:
+
+```
+adb shell getprop ro.malachite.source.id            # src-<12 hex digits>
+adb shell cat /product/etc/malachite-source.xml     # every project and commit
+```
+
+Anyone can sync that exact tree from the file: copy it to `.repo/manifests/`, then
+`repo init -m malachite-source.xml` and `repo sync`. The ID ends in `-untraceable` if
+something was uncommitted or unpushed, `-stale` if the device, vendor or kernel tree
+changed after the snapshot, and is `none` if no snapshot was taken.
+
+Even without a snapshot, every build records its device, vendor and kernel trees as
+`<repository>@<commit>`, from wherever they were synced (forks included):
 
 ```
 adb shell getprop | grep malachite.source
-[ro.malachite.source.device]: [malachite-project/android_device_xiaomi_malachite@a917ca0]
-[ro.malachite.source.kernel]: [malachite-project/android_device_xiaomi_malachite-kernel@a9522e4]
-[ro.malachite.source.vendor]: [malachite-project/android_vendor_xiaomi_malachite@7e73953]
 ```
-
-Each value is the repository the tree was synced from (or pushed to) and the commit
-that was built. Nothing has to be done to get it; for a build anyone can trace:
-
-- keep the trees as git checkouts (repo sync or git clone, not copies);
-- commit your changes and push them before building. `-dirty` means the tree had
-  uncommitted changes, `-unpublished` that the commit was on no remote branch, and
-  then nobody else can get that exact source.
-
-Put the three lines in your release notes and in bug reports.
 
 ## Credits
 

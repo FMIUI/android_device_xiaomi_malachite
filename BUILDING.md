@@ -7,11 +7,11 @@ traceable to its exact source.
 
 Examples use `lineage-23.2` (Android 16). For Android 17 use `lineage-24.0` in the same way.
 
-**Contents:** [Rules](#rules) · [Which repositories](#which-repositories) ·
-[Forking](#forking) · [Setting up your tree](#setting-up-your-tree) ·
-[Your ROM's changes](#your-roms-changes) · [Staying in sync](#staying-in-sync) ·
-[Building with a source ID](#building-with-a-source-id) · [Releasing](#releasing) ·
-[Bug reports](#bug-reports) · [Sending fixes back](#sending-fixes-back)
+**Contents:** [Rules](#rules) | [Which repositories](#which-repositories) |
+[Forking](#forking) | [Setting up your tree](#setting-up-your-tree) |
+[Your ROM's changes](#your-roms-changes) | [Staying in sync](#staying-in-sync) |
+[Building with a source ID](#building-with-a-source-id) | [Releasing](#releasing) |
+[Bug reports](#bug-reports) | [Sending fixes back](#sending-fixes-back)
 
 ## Rules
 
@@ -85,7 +85,7 @@ Repositories you don't change: don't fork them, use ours directly.
 
 ## Your ROM's changes
 
-Typical ROM changes: the product makefile (`lineage_malachite.mk` →
+Typical ROM changes: the product makefile (`lineage_malachite.mk` ->
 `crdroid_malachite.mk`, `AndroidProducts.mk`), ROM flags and overlays.
 
 - Commit them on your ROM branch, separately from fixes. Start the subject with the ROM:

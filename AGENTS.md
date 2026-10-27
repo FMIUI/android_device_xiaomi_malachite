@@ -25,6 +25,19 @@ shipping a hack.
 - `manifests/malachite.xml` lists every repository the build uses; the comment at its top
   says what each fork changes.
 
+## Code
+
+- Read the files around your change first, and make the change look like them. If it is
+  large or introduces a new pattern, stop and ask before writing it.
+- Reuse what the tree already has. Don't add new subsystems or invasive changes that
+  risk existing behaviour.
+- Comments are short and say something a later reader needs (a non-obvious reason), never
+  what the line does or what task you were given. Don't add comments to code you copied.
+- ASCII only in code, comments and commit messages: `-` not an em dash, `->` not an arrow,
+  `...` not an ellipsis.
+- An agent never runs `git push` or opens a pull request. The person reviews the diff,
+  tests it and sends it.
+
 ## Hard rules
 
 1. **Never edit stock blobs.** No hand edits, hex patches or replaced files in
@@ -76,7 +89,7 @@ shipping a hack.
 
 ## Commits
 
-**Subject:** `malachite: <subdir>: <what it does>` — short, plain, lowercase after the
+**Subject:** `malachite: <subdir>: <what it does>` - short, plain, lowercase after the
 prefixes, no full stop. Add the sub-directory when the change is inside one.
 
 ```

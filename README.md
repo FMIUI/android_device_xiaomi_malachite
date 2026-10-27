@@ -12,6 +12,9 @@ these trees, use `lineage-23.2`. `lineage-24.0` is the Android 17 test line.
 
 ## Building
 
+See [BUILDING.md](BUILDING.md) for building ROMs from these trees (forking, staying in
+sync, source ID) and [AGENTS.md](AGENTS.md) for the working rules.
+
 `manifests/malachite.xml` is the local manifest for the whole tree: set up a
 LineageOS 23.2 checkout, copy it to `.repo/local_manifests/`, sync, then
 `breakfast malachite`. The comment at its top lists what each fork changes.

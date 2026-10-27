@@ -14,6 +14,9 @@ these trees, use `lineage-24.0`. `lineage-23.2` (Android 16) stays as it was;
 
 ## Building
 
+See [BUILDING.md](BUILDING.md) for building ROMs from these trees (forking, staying in
+sync, source ID) and [AGENTS.md](AGENTS.md) for the working rules.
+
 `manifests/malachite.xml` is the local manifest for the whole tree: set up a
 LineageOS 24.0 checkout, copy it to `.repo/local_manifests/`, sync, then
 `breakfast malachite`. The comment at its top lists what each fork changes.

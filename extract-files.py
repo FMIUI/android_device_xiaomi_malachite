@@ -83,13 +83,6 @@ lib_fixups: lib_fixups_user_type = {
         'libneuron_graph_delegate.mtk',
         'libtflite_mtk',
         'vendor.mediatek.hardware.apuware.utils-V1-ndk',
-        # hardware/mediatek builds this interface from source on lineage-24.0;
-        # stock's V1 matches none of its frozen versions, so the stock audio
-        # HALs keep their own copy (same file name, _vendor module name).
-        'vendor.mediatek.hardware.bluetooth.audio-V1-ndk',
-        # Built from source on lineage-24.0 for system_ext only; stock's
-        # vendor netdagent keeps its own copy.
-        'vendor.mediatek.hardware.netdagent@1.0',
     ): lib_fixup_vendor_suffix,
 }
 
@@ -109,7 +102,8 @@ blob_fixups: blob_fixups_user_type = {
         .replace_needed('libtinyxml2.so', 'libtinyxml2-v34.so')
         .replace_needed('libalsautils.so', 'libalsautils-stock.so')
         .binary_regex_replace(b'A2dpsuspendonly', b'A2dpSuspended\x00\x00')
-        .binary_regex_replace(b'BTAudiosuspend', b'A2dpSuspended\x00'),
+        .binary_regex_replace(b'BTAudiosuspend', b'A2dpSuspended\x00')
+        .replace_needed('vendor.mediatek.hardware.bluetooth.audio-V1-ndk.so', 'vendor.mediatek.hardware.bluetooth.audio-V1-ndk_stock.so'),
 
      'vendor/lib64/libsi_sixth.so': blob_fixup()
         .replace_needed('audio.primary.mediatek.so', 'audio.primary.mt6878.so'),
@@ -194,8 +188,19 @@ blob_fixups: blob_fixups_user_type = {
     'vendor/lib64/libbluetooth_audio_session_stock.so': blob_fixup()
         .replace_needed('libbluetooth_audio_session_aidl.so', 'libbluetooth_audio_session_aidl_stock.so'),
 
-    'vendor/lib64/vendor.mediatek.hardware.bluetooth.audio-V1-ndk.so': blob_fixup()
+    # hardware/mediatek builds vendor.mediatek.hardware.bluetooth.audio-V1-ndk and vendor.mediatek.hardware.netdagent@1.0 from source on lineage-24.0 and
+    # installs them in vendor/lib64 under the same names. Stock's bluetooth.audio
+    # V1 matches none of its frozen versions, so the stock blobs keep their own
+    # copies, renamed _stock like the Bluetooth session libraries.
+    'vendor/lib64/vendor.mediatek.hardware.bluetooth.audio-V1-ndk_stock.so': blob_fixup()
         .replace_needed('android.hardware.audio.common-V1-ndk.so', 'android.hardware.audio.common-V2-ndk.so'),
+
+    ('vendor/lib64/android.hardware.bluetooth.audio-impl-mediatek.so',
+     'vendor/lib64/libbluetooth_audio_session_aidl_mtk.so'): blob_fixup()
+        .replace_needed('vendor.mediatek.hardware.bluetooth.audio-V1-ndk.so', 'vendor.mediatek.hardware.bluetooth.audio-V1-ndk_stock.so'),
+
+    ('vendor/lib64/libmtk-ril.so', 'vendor/lib64/libmtkmipc-ril.so'): blob_fixup()
+        .replace_needed('vendor.mediatek.hardware.netdagent@1.0.so', 'vendor.mediatek.hardware.netdagent@1.0_stock.so'),
 
     ('vendor/bin/hw/android.hardware.graphics.allocator-V2-service-mediatek',
      'vendor/lib64/egl/libGLES_mali.so',

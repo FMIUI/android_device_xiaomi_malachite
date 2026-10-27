@@ -1,2 +1,0 @@
-# Source ID, see source_id.te.
-/(system_ext|system/system_ext)/etc/source(/.*)?    u:object_r:malachite_source_file:s0

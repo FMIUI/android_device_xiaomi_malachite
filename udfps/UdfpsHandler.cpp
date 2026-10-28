@@ -246,6 +246,15 @@ class XiaomiMalachiteUdfpsHandler : public UdfpsHandler {
         }
     }
 
+    void onAuthenticationStarted() {
+        LOG(DEBUG) << __func__;
+        // goodix sends "waiting for finger" (21) only after a finished match, not after
+        // a cancelled one, so an app prompt after a PIN or face unlock never armed FOD.
+        if (!isFpcFod) {
+            setFodStatus(FOD_STATUS_ON);
+        }
+    }
+
     void cancel() {
         LOG(DEBUG) << __func__;
         setFodStatus(FOD_STATUS_OFF);

@@ -1,0 +1,7 @@
+#
+# SPDX-FileCopyrightText: The LineageOS Project
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# The privileged-client list controls vendor camera stream configuration.
+get_prop(cameraserver, vendor_camera_privapp_list_prop)

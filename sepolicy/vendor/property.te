@@ -1,0 +1,7 @@
+#
+# SPDX-FileCopyrightText: The LineageOS Project
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# Read by Camera2 and cameraserver to preserve MiCamera's vendor stream sizes.
+vendor_restricted_prop(vendor_camera_privapp_list_prop)

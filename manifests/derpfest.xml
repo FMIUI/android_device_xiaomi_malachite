@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Local manifest for building LineageOS 23.2 for malachite entirely from
+     the malachite-project forks. Copy to .repo/local_manifests/malachite.xml after
+     `repo init -u https://github.com/LineageOS/android.git -b lineage-23.2`.
+
+     Every project uses its fork's lineage-23.2 branch (lineage-24.0 is the
+     Android 17 test line). These carry changes on top of their source:
+       device tree         chara's release + unmerged charger/module-loader
+                           fixes + WPA3 nl80211 version opt-in + the
+                           September 2026 audit, power, display and
+                           user-report fixes
+       wpa_supplicant_8    current LineageOS + CONFIG_DISABLE_WPA_VERSION_3
+       frameworks/native   chara's libgui ABI fix, rebased on current LineageOS,
+                           + PHH's MediaTek GED KPI frame timestamps (GPU
+                           DVFS), built only with libgui support_mtk_ged_kpi
+       frameworks/base     current LineageOS + PixelOS's FaceSense provider
+                           (face unlock, off unless ro.face.sense_service)
+       Settings, Telephony chara's native eSIM selection, rebased on current
+                           LineageOS; Telephony also keeps an accepted SIM
+                           switch running when the dialog closes
+       hardware/mediatek   chara + MediaTek wpa_supplicant driver-command
+                           library (lib_driver_cmd_mt66xx), built with the
+                           supplicant's flags
+       sepolicy_vndr       current LineageOS + chara's six MT6878 labels
+                           and radio-property rules
+       vendor              chara + Aperture kept beside MiuiCamera
+                           (QR scanner)
+       Bluetooth           current LineageOS (which now includes change
+                           507009, the MTK A2DP offload coex fix this fork
+                           first carried) + LE Audio fixes: codec configs
+                           kept in step, pending Audio HAL check, CIG retry
+                           with a symmetric PHY
+       hardware/xiaomi     chara's release + fingerprint ignore-touches and
+                           display state passed to UdfpsHandler
+     malachite-kernel and vendor/mediatek/ims are chara's release state,
+     unmodified.
+     ParanoidSense (face unlock app) is PixelOS's sixteen-qpr2, unmodified,
+     under the name lineage-23.2.
+     hardware/dolby is crDroid's LunarisDolby branch reduced to its Dolby
+     control app; the Dolby DAX vendor stack comes from stock 208 in
+     vendor/xiaomi/malachite.
+
+     Kernel sources are built separately; see kernel_manifest-6.1.
+-->
+<manifest>
+  <remote name="malachite-project" fetch="https://github.com/malachite-project/" />
+  <remote name="fmiui" fetch="https://github.com/FMIUI/" />
+
+  <!-- Device -->
+  <remove-project path="device/xiaomi/malachite" optional="true" />
+  <project path="device/xiaomi/malachite" name="android_device_xiaomi_malachite" remote="fmiui" revision="derpfest-16" />
+  <remove-project path="device/xiaomi/malachite-kernel" optional="true" />
+  <project path="device/xiaomi/malachite-kernel" name="android_device_xiaomi_malachite-kernel" remote="malachite-project" revision="lineage-23.2" />
+  <remove-project path="vendor/xiaomi/malachite" optional="true" />
+  <project path="vendor/xiaomi/malachite" name="proprietary_vendor_xiaomi_malachite" remote="malachite-project" revision="lineage-23.2" />
+
+  <!-- Platform -->
+  <remove-project path="hardware/mediatek" optional="true" />
+  <project path="hardware/mediatek" name="android_hardware_mediatek" remote="malachite-project" revision="lineage-23.2" />
+  <remove-project path="hardware/xiaomi" optional="true" />
+  <project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="malachite-project" revision="lineage-23.2" />
+  <remove-project path="device/mediatek/sepolicy_vndr" optional="true" />
+  <project path="device/mediatek/sepolicy_vndr" name="android_device_mediatek_sepolicy_vndr" remote="malachite-project" revision="lineage-23.2" />
+  <remove-project path="vendor/mediatek/ims" optional="true" />
+  <project path="vendor/mediatek/ims" name="android_vendor_mediatek_ims" remote="malachite-project" revision="lineage-23.2" />
+
+  <!-- Additions -->
+  <project path="hardware/dolby" name="android_hardware_dolby" remote="malachite-project" revision="lineage-23.2" />
+  <!-- ContactsProvider pinned before 5e148909 (SQL injection fix in SelectionBuilder), which needs a newer SQLiteTokenizer than DerpFest frameworks/base -->
+  <remove-project name="LineageOS/android_packages_providers_ContactsProvider" />
+  <project path="packages/providers/ContactsProvider" name="LineageOS/android_packages_providers_ContactsProvider" groups="pdk-cw-fs,pdk-fs" revision="59be632a60c69882bf5f772e31b2a60ca68dc483" upstream="lineage-23.2" />
+</manifest>

@@ -604,8 +604,9 @@
          panel PQ table (/vendor/etc/o16u_*_pq.xml, identical for all four panels), Xiaomi's
          own modes with an sRGB and a Display P3 variant each. Only intents whose table
          entries differ are listed: 0x100-0x102 are identical to each other, 0x10c equals
-         0x10b. 0x10d (expert wide colour) is left out: without Xiaomi's display service it
-         shows only a faint red. Natural (0) is left out too: it lets SurfaceFlinger use the
+         stock 0x10b (extract-files.py lowers expert sRGB's saturation). 0x10d (expert
+         wide colour) is left out: without Xiaomi's display service it shows only a
+         faint red. Natural (0) is left out too: it lets SurfaceFlinger use the
          table's MediaTek template modes (HAL_sRGB / HAL_displayP3), where the panel looks
          pink and wide-colour content turns pink.
          The first entry is the default, and the framework also falls back to it when the

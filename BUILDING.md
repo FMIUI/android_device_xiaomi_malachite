@@ -5,7 +5,14 @@ RisingOS, ...) for malachite from the malachite-project trees. Following it keep
 ROM in sync with our fixes, lets your fixes come back to everyone, and makes every build
 traceable to its exact source.
 
-Examples use `lineage-23.2` (Android 16). For Android 17 use `lineage-24.0` in the same way.
+Our main branch is `lineage-24.0` (LineageOS 24.0, Android 17). Examples use RisingOS;
+substitute your ROM.
+
+**crDroid and Evolution X are already done:** every malachite-project fork they need has
+a `crdroid-17.0` or `evolutionx-24.0` branch, kept level with `lineage-24.0`, and the device
+tree's branch of that name carries the local manifest (`manifests/crdroid.xml`,
+`manifests/evolution.xml`) and the build notes (CRDROID.md, EVOLUTION.md). Build from
+those, or fork them and follow this guide for your changes.
 
 **Contents:** [Rules](#rules) | [Which repositories](#which-repositories) |
 [Forking](#forking) | [Setting up your tree](#setting-up-your-tree) |
@@ -18,8 +25,8 @@ Examples use `lineage-23.2` (Android 16). For Android 17 use `lineage-24.0` in t
 1. **Fork, don't copy.** Use GitHub's Fork button, or push our history to your
    repository. Never re-create a tree by uploading files: that loses the history, and
    then neither our fixes nor yours can be merged.
-2. **One branch per ROM, based on ours.** For example `crdroid-16` from `lineage-23.2`.
-   Keep our `lineage-23.2` branch in your fork untouched.
+2. **One branch per ROM, based on ours.** For example `rising-17` from `lineage-24.0`.
+   Keep our `lineage-24.0` branch in your fork untouched.
 3. **Merge our updates, don't re-apply them.** Merge our branch into yours (see
    [Staying in sync](#staying-in-sync)); don't squash, rebase or copy our commits.
 4. **Commit and push everything before you build,** patches included. A build from
@@ -37,7 +44,7 @@ top says what each fork changes.
 | --- | --- | --- |
 | Device | `android_device_xiaomi_malachite`, `proprietary_vendor_xiaomi_malachite`, `android_device_xiaomi_malachite-kernel` | Fork and use as they are; your ROM changes go on your branch. |
 | Hardware | `android_hardware_mediatek`, `android_hardware_xiaomi`, `android_device_mediatek_sepolicy_vndr`, `android_vendor_mediatek_ims`, `android_hardware_dolby` | Use our branch if your ROM tracks LineageOS's; otherwise merge our commits into your ROM's version. |
-| Framework | `android_frameworks_base`, `android_frameworks_native`, `android_packages_apps_Settings`, `android_packages_services_Telephony`, `android_packages_modules_Bluetooth`, `android_external_wpa_supplicant_8` | Your ROM has its own forks of these. Cherry-pick our commits onto them (they are on top of LineageOS, by `git log` against LineageOS's branch). |
+| Framework | `android_frameworks_base`, `android_frameworks_native`, `android_packages_apps_Settings`, `android_packages_services_Telephony`, `android_packages_modules_Bluetooth`, `android_external_wpa_supplicant_8` | Your ROM has its own forks of these. Cherry-pick our commits onto them (they are on top of LineageOS, by `git log` against LineageOS's branch). Our `crdroid-17.0` and `evolutionx-24.0` branches of these forks show how. |
 | Kernel | `kernel_manifest-6.1` and the kernel repositories | Only to build the kernel; the device uses the prebuilt in `malachite-kernel`. |
 
 ## Forking
@@ -49,8 +56,8 @@ For each repository you need to change:
    ```
    git clone https://github.com/<you>/android_device_xiaomi_malachite
    cd android_device_xiaomi_malachite
-   git checkout -b crdroid-16 origin/lineage-23.2
-   git push -u origin crdroid-16
+   git checkout -b rising-17 origin/lineage-24.0
+   git push -u origin rising-17
    ```
 3. Add ours as a second remote, for updates:
    ```
@@ -66,7 +73,7 @@ Repositories you don't change: don't fork them, use ours directly.
    ```
    mkdir -p .repo/local_manifests
    curl -o .repo/local_manifests/malachite.xml \
-     https://raw.githubusercontent.com/malachite-project/android_device_xiaomi_malachite/lineage-23.2/manifests/malachite.xml
+     https://raw.githubusercontent.com/malachite-project/android_device_xiaomi_malachite/lineage-24.0/manifests/malachite.xml
    ```
 3. Edit it for your ROM:
    - for each repository you forked, add a remote for your account and point the
@@ -74,12 +81,12 @@ Repositories you don't change: don't fork them, use ours directly.
      ```xml
      <remote name="you" fetch="https://github.com/<you>" />
      <project path="device/xiaomi/malachite" name="android_device_xiaomi_malachite"
-              remote="you" revision="crdroid-16" />
+              remote="you" revision="rising-17" />
      ```
    - remove the projects your ROM already provides itself (usually the framework
      forks: frameworks/base, frameworks/native, Settings, Telephony, Bluetooth);
    - keep the rest pointing at malachite-project.
-4. Commit that manifest to your device tree fork (for example `manifests/crdroid.xml`),
+4. Commit that manifest to your device tree fork (for example `manifests/rising.xml`),
    so others can rebuild your ROM too.
 5. `repo sync`.
 
@@ -87,13 +94,14 @@ Repositories you don't change: don't fork them, use ours directly.
 
 Typical ROM changes: the product makefile and `AndroidProducts.mk`, ROM flags and
 overlays. The build finds a product's makefile by its PRODUCT_NAME, so the file's name
-must match it: ROMs whose tools keep the `lineage_` prefix (crDroid, Evolution X) keep
-`lineage_malachite.mk`; renaming only the file makes `breakfast` find no product.
+must match it: ROMs whose tools keep the `lineage_` prefix (crDroid, Evolution X and most
+LineageOS-based ROMs) keep `lineage_malachite.mk`; renaming only the file makes
+`breakfast` find no product.
 
 - Commit them on your ROM branch, separately from fixes. Start the subject with the ROM:
-  `malachite: crDroid: set the crDroid product options`.
+  `malachite: rising: set the RisingOS product options`.
 - A fix that isn't specific to your ROM (a bug in the device, a HAL, SELinux) goes in its
-  own commit, written so it applies to `lineage-23.2` too, and should be sent back (see
+  own commit, written so it applies to `lineage-24.0` too, and should be sent back (see
   [Sending fixes back](#sending-fixes-back)).
 - Patches your ROM applies with a script must be committed to a fork before building;
   otherwise the build is marked untraceable.
@@ -104,9 +112,9 @@ When we push fixes, merge them into your ROM branch:
 
 ```
 cd device/xiaomi/malachite
-git fetch malachite lineage-23.2
-git merge malachite/lineage-23.2
-git push <your remote> HEAD:crdroid-16
+git fetch malachite lineage-24.0
+git merge malachite/lineage-24.0
+git push <your remote> HEAD:rising-17
 ```
 
 Do the same for each forked repository. Resolve conflicts in the merge commit; never
@@ -154,10 +162,10 @@ Anyone can sync the exact tree of a build from its record:
 Put these in every release post:
 
 ```
-ROM:         crDroid 12.x (Android 16)
+ROM:         RisingOS x.y (Android 17)
 Source ID:   src-3f9a1c2e0b4d
 Device tree: <you>/android_device_xiaomi_malachite@1a2b3c4
-Based on:    malachite-project lineage-23.2 @ <commit of our branch you last merged>
+Based on:    malachite-project lineage-24.0 @ <commit of our branch you last merged>
 ```
 
 ## Bug reports
@@ -170,5 +178,5 @@ features belong with your ROM.
 ## Sending fixes back
 
 See [CONTRIBUTING.md](https://github.com/malachite-project/.github/blob/main/CONTRIBUTING.md). In short: put the fix on a branch made from our
-`lineage-23.2` (not from your ROM branch), test it, and open a pull request to our
-`lineage-23.2`.
+`lineage-24.0` (not from your ROM branch), test it, and open a pull request to our
+`lineage-24.0`.

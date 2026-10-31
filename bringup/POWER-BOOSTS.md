@@ -1,6 +1,8 @@
 # CPU boosts, governor and ADPF
 
-**Status: untested.** Nothing here has been built or measured on a device.
+**Status:** in every build since 2026-10-23 (`configs/powerhint.json`, `init/init.mt6878.power.rc`).
+The values have not been measured on a phone; tester reports on smoothness are the only
+evidence so far.
 
 ## What a uclamp boost is
 

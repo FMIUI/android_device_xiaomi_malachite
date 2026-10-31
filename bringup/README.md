@@ -1,6 +1,9 @@
 # Malachite revival workspace
 
-> Moving to LineageOS 24.0 (Android 17): see [LINEAGE-24.md](LINEAGE-24.md). The rest of this page describes the `lineage-23.2` baseline.
+> **Historical record.** This folder documents the 2026 bring-up of the `lineage-23.2` (Android 16)
+> baseline and its audits; it is kept for reference and is not the current state. Today's
+> branches are in the [README](../README.md); the move to Android 17 is in
+> [LINEAGE-24.md](LINEAGE-24.md).
 
 **Status: source bring-up in progress; no ROM build, phone boot or daily-driver certification.** Start with [ARCHITECTURE.md](ARCHITECTURE.md), [HISTORY.md](HISTORY.md), [SAFETY.md](SAFETY.md) and [VERIFICATION.md](VERIFICATION.md). The baseline is `lineage-23.2`, not an automatic upgrade to newer firmware or blobs.
 

@@ -17,11 +17,16 @@ shipping a hack.
 ## The project
 
 - Device: Redmi Note 14 Pro 5G / POCO X7 5G, codename **malachite**, MediaTek MT6878.
-- Branches: `lineage-23.2` (Android 16, stable) and `lineage-24.0` (Android 17, test
-  line). New work goes on `fix/<name>` or `feature/<name>` made from the branch it is for,
-  and reaches that branch only after it has been built and tested on a phone.
-- A change that applies to both Android versions is made on both, with the same result.
-  Behaviour must not drift between them.
+- Branches: `lineage-24.0` (LineageOS 24.0, Android 17) is the main line. `crdroid-17.0`
+  and `evolutionx-24.0` are the crDroid and Evolution X builds of it. `lineage-23.2`
+  (Android 16) is retired. New work goes on `fix/<name>` or `feature/<name>` made from
+  `lineage-24.0`, and is merged into it once a build with it succeeds; merged branches
+  are then deleted.
+- Every change on `lineage-24.0` also goes to both ROM branches, with the same result:
+  merge `lineage-24.0` into them in the device, vendor and hardware repositories, and
+  cherry-pick onto their framework forks (which sit on crDroid's and Evolution X's own
+  frameworks). Skip a change there only where that ROM already has its own version of it.
+  Behaviour must not drift between the ROMs.
 - `manifests/malachite.xml` lists every repository the build uses; the comment at its top
   says what each fork changes.
 

@@ -4,13 +4,19 @@ Device tree for an unofficial LineageOS 24.0 (Android 17) build for malachite.
 
 **Downloads, updates and support:** [Telegram group](https://t.me/malachite_project)
 
-## Branch
+## Branches
 
-`lineage-24.0` is the current branch, in this repository and in every other
-[malachite-project](https://github.com/malachite-project) fork. To base work on
-these trees, use `lineage-24.0`. `lineage-23.2` (Android 16) stays as it was;
-[bringup/LINEAGE-24.md](bringup/LINEAGE-24.md) lists what moving each fork to
-24.0 changed.
+| Branch | ROM | Notes |
+| --- | --- | --- |
+| `lineage-24.0` | LineageOS 24.0 (Android 17) | The main line, in this repository and in every other [malachite-project](https://github.com/malachite-project) fork. Base your work on it. |
+| `crdroid-17.0` | crDroid 13.0 (Android 17) | Kept level with `lineage-24.0`; see [CRDROID.md](https://github.com/malachite-project/android_device_xiaomi_malachite/blob/crdroid-17.0/CRDROID.md). |
+| `evolutionx-24.0` | Evolution X 12.3 (Android 17) | Kept level with `lineage-24.0`; see [EVOLUTION.md](https://github.com/malachite-project/android_device_xiaomi_malachite/blob/evolutionx-24.0/EVOLUTION.md). |
+
+Every fix on `lineage-24.0` also goes to both ROM branches: merged in the device,
+vendor and hardware repositories, cherry-picked onto each ROM's own framework forks.
+`lineage-23.2` (Android 16) is retired and no longer published;
+[bringup/LINEAGE-24.md](bringup/LINEAGE-24.md) lists what moving each fork to 24.0
+changed.
 
 ## Building
 
@@ -19,7 +25,9 @@ sync, source ID) and [AGENTS.md](AGENTS.md) for the working rules.
 
 `manifests/malachite.xml` is the local manifest for the whole tree: set up a
 LineageOS 24.0 checkout, copy it to `.repo/local_manifests/`, sync, then
-`breakfast malachite`. The comment at its top lists what each fork changes.
+`breakfast malachite`. The comment at its top lists what each fork changes. The
+crDroid and Evolution X branches carry their own local manifests
+(`manifests/crdroid.xml`, `manifests/evolution.xml`) for those ROMs' sources.
 Kernel sources are built separately; see
 [kernel_manifest-6.1](https://github.com/malachite-project/kernel_manifest-6.1).
 

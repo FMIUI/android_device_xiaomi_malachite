@@ -1,8 +1,9 @@
 # Moving malachite to LineageOS 24.0 (Android 17)
 
-**Status: source port only. Nothing here has been built as a ROM, booted or
-tested on a phone.** The `lineage-23.2` branches and the evidence under
-[candidates](candidates) are unchanged.
+**Status (2026-10-31): `lineage-24.0` is the main line and builds as a ROM; testers run
+it daily.** This page records how each fork was moved to 24.0 on 2026-10-26; later
+fixes are in each repository's history. `lineage-23.2` is retired and no longer
+published; the evidence under [candidates](candidates) describes that 23.2 baseline.
 
 Upstream base: LineageOS `lineage-24.0` (AOSP `android-17.0.0_r1`, release
 config `cp2a`). Every fork's own commits were replayed onto the upstream
@@ -23,9 +24,9 @@ line; where a commit needed adapting, its message says what changed and why.
 | hardware/mediatek | Codec2 AIDL, memtrack hardening and the mt66xx driver-command library replayed; BT-audio interfaces, dummy `libaedv` and `aee_modem_warning()` dropped because upstream now has them; `tests/` passing |
 | hardware/xiaomi | All six commits applied cleanly |
 | device/mediatek/sepolicy_vndr | Six labels and rules replayed, no duplicates of upstream's |
-| packages/modules/Bluetooth | Fork dropped: LineageOS change 507009 is merged in `lineage-24.0` |
+| packages/modules/Bluetooth | LineageOS change 507009 is merged in `lineage-24.0`; the fork came back for the four LE Audio fixes (codec configs, Audio HAL check, CIG retry) |
 | vendor/xiaomi/malachite | `libformatter` and `libmnl` renamed (below); no other blob changed |
-| malachite-kernel, vendor/mediatek/ims, ParanoidSense, hardware/dolby | Content unchanged, branch renamed only |
+| malachite-kernel, vendor/mediatek/ims, ParanoidSense, hardware/dolby | Content unchanged, branch renamed only. ParanoidSense stays in the manifest only for the face interface frameworks/base is built against; face unlock is stock's mifaced |
 | kernel workspace (kernel_manifest-6.1 and its four projects) | Unchanged; it is pinned separately and does not depend on the Android version |
 
 ## Android 17 changes the device tree needed

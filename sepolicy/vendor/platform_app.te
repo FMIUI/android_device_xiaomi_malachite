@@ -6,3 +6,7 @@ binder_call(hal_aidlbgservice, platform_app_all)
 binder_call(platform_app_all, hal_fingerprint_default)
 
 allow platform_app_all vendor_hal_fingerprint_service_xiaomi:service_manager find;
+
+# Camera2 checks the vendor stream allowlist in the platform-signed camera app
+# (platform_app_36 on Android 17, since MiCamera targets SDK 35).
+get_prop(platform_app_all, vendor_camera_privapp_list_prop)

@@ -1,4 +1,6 @@
 # Camera
+# MiCamera needs vendor stream sizes that are absent from the standard size table.
+persist.vendor.camera.privapp.list u:object_r:vendor_camera_privapp_list_prop:s0 exact string
 persist.vendor.camera. u:object_r:vendor_camera_persist_prop:s0
 persist.vendor.XDRVersion  u:object_r:vendor_camera_persist_prop:s0
 vendor.camera. u:object_r:vendor_camera_prop:s0

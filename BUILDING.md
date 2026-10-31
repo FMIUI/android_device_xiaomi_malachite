@@ -85,11 +85,13 @@ Repositories you don't change: don't fork them, use ours directly.
 
 ## Your ROM's changes
 
-Typical ROM changes: the product makefile (`lineage_malachite.mk` ->
-`crdroid_malachite.mk`, `AndroidProducts.mk`), ROM flags and overlays.
+Typical ROM changes: the product makefile and `AndroidProducts.mk`, ROM flags and
+overlays. The build finds a product's makefile by its PRODUCT_NAME, so the file's name
+must match it: ROMs whose tools keep the `lineage_` prefix (crDroid, Evolution X) keep
+`lineage_malachite.mk`; renaming only the file makes `breakfast` find no product.
 
 - Commit them on your ROM branch, separately from fixes. Start the subject with the ROM:
-  `malachite: crDroid: add crdroid_malachite product`.
+  `malachite: crDroid: set the crDroid product options`.
 - A fix that isn't specific to your ROM (a bug in the device, a HAL, SELinux) goes in its
   own commit, written so it applies to `lineage-23.2` too, and should be sent back (see
   [Sending fixes back](#sending-fixes-back)).

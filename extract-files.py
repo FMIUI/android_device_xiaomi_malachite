@@ -118,6 +118,13 @@ blob_fixups: blob_fixups_user_type = {
      ('vendor/etc/libnfc-tms.conf', 'odm/etc/libnfc-tms_thn31f.conf', 'odm/etc/libnfc-tms_thn31s.conf'): blob_fixup()
         .regex_replace('NFC_DEBUG_ENABLED=1', 'NFC_DEBUG_ENABLED=0'),
 
+    # Expert sRGB (render intent 0x10b, both colour spaces) looks more saturated here than
+    # on HyperOS. Lower its colour engine saturation gain from 50 to 35, tuned by a tester
+    # against stock by eye; the other modes keep the stock values.
+     ('vendor/etc/o16u_36_02_0b_dsc_vdo_pq.xml', 'vendor/etc/o16u_42_02_0a_dsc_vdo_pq.xml',
+      'vendor/etc/o16u_42_02_0d_dsc_vdo_pq.xml', 'vendor/etc/o16u_44_0f_0c_dsc_vdo_pq.xml'): blob_fixup()
+        .regex_replace(r'(Name="expert_srgb"(?:(?!</Mode>)[\s\S])*?FeatureID="0x2500"[^\n]*? SatGain=")50"', r'\g<1>35"'),
+
      'vendor/etc/init/android.hardware.graphics.composer@3.2-service.rc': blob_fixup()
         .regex_replace('ServiceCapacityLow', 'ProcessCapacityHigh HighPerformance'),
 

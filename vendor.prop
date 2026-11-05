@@ -381,6 +381,7 @@ debug.sf.enable_gl_backpressure=false
 debug.sf.enable_hwc_vds=0
 debug.sf.enable_transaction_tracing=false
 debug.sf.frame_rate_multiple_threshold=120
+debug.sf.predict_hwc_composition_strategy=0
 debug.sf.use_phase_offsets_as_durations=1
 debug.sf.late.sf.duration=13100000
 debug.sf.late.app.duration=14600000
@@ -407,6 +408,7 @@ ro.surface_flinger.has_HDR_display=true
 ro.surface_flinger.has_dolby_vision=true
 ro.surface_flinger.has_wide_color_display=true
 ro.surface_flinger.protected_contents=true
+ro.surface_flinger.uclamp.min=160
 ro.surface_flinger.use_color_management=true
 ro.surface_flinger.wcg_composition_dataspace=143261696
 

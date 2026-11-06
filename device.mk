@@ -194,11 +194,6 @@ PRODUCT_PACKAGES += \
 # Face unlock (ParanoidSense, front camera). frameworks/base registers its
 # SenseProvider only when ro.face.sense_service is true. It registers as
 # STRENGTH_WEAK, so it can never release keystore-bound keys.
-PRODUCT_PACKAGES += \
-    ParanoidSense
-
-PRODUCT_SYSTEM_EXT_PROPERTIES += \
-    ro.face.sense_service=true
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.biometrics.face.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/android.hardware.biometrics.face.xml
@@ -453,8 +448,6 @@ PRODUCT_COPY_FILES += \
 include $(DEVICE_PATH)/vendor_logtag.mk
 
 # Radio
-PRODUCT_PACKAGES += \
-    mdota_symlink
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.telephony.gsm.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.telephony.gsm.xml \

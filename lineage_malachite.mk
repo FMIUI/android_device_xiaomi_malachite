@@ -4,6 +4,7 @@
 #
 
 # Inherit from those products. Most specific first.
+$(call inherit-product, device/xiaomi/malachite/lunaris_flags.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
@@ -30,3 +31,4 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     DeviceProduct=$(PRODUCT_SYSTEM_NAME)
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
+$(call inherit-product-if-exists, vendor/lineage-priv/keys/keys.mk)

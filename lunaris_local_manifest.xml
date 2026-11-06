@@ -6,7 +6,7 @@
 
   <!-- Device (your FMIUI fork) -->
   <remove-project path="device/xiaomi/malachite" optional="true" />
-  <project path="device/xiaomi/malachite" name="android_device_xiaomi_malachite" remote="fmiui" revision="lineage-23.2" />
+  <project path="device/xiaomi/malachite" name="android_device_xiaomi_malachite" remote="fmiui" revision="lunaris" />
 
   <!-- Kernel (prebuilt), vendor -->
   <remove-project path="device/xiaomi/malachite-kernel" optional="true" />
@@ -20,7 +20,7 @@
   <remove-project path="hardware/xiaomi" optional="true" />
   <project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="lineageos-up" revision="lineage-23.2" />
   <remove-project path="device/mediatek/sepolicy_vndr" optional="true" />
-  <project path="device/mediatek/sepolicy_vndr" name="android_device_mediatek_sepolicy_vndr" remote="fmiui" revision="3865c6e1098175ca1082cdafb45d82a805ec7d00" upstream="lineage-23.2" />
+  <project path="device/mediatek/sepolicy_vndr" name="android_device_mediatek_sepolicy_vndr" remote="fmiui" revision="lunaris" />
   <remove-project path="vendor/mediatek/ims" optional="true" />
   <project path="vendor/mediatek/ims" name="android_vendor_mediatek_ims" remote="malachite-project" revision="06c462f1dfc2bb62e70e1d827b14bb364dc97857" upstream="lineage-24.0" />
 

@@ -14,3 +14,4 @@ $(call soong_config_set,surfaceflinger,frame_rate_category_high,120)
 $(call soong_config_set,surfaceflinger,frame_rate_category_min,60)
 
 PRODUCT_SYSTEM_PROPERTIES += ro.lunaris.maintainer=Zoro
+PRODUCT_MAINLINE_BLUETOOTH_SEPOLICY_DEV_CERTIFICATES := vendor/lineage-priv/keys/

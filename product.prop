@@ -12,5 +12,5 @@ ro.product.camera.livephoto.support=3
 # POCO boards override the default from marketname/. The override must load
 # from product: ro.product.marketname has no label of its own (default_prop),
 # which only init may set, and odm/vendor prop files load as vendor_init.
-ro.product.marketname=Redmi Note 14 Pro 5G
+ro.product.marketname=POCO X7
 import /product/etc/marketname/${ro.boot.board_id}.prop

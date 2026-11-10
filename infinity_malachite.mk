@@ -10,10 +10,15 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from device makefile.
 $(call inherit-product, device/xiaomi/malachite/device.mk)
 
-# Inherit some common LineageOS stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+# Project Infinity X
+INFINITY_MAINTAINER := "Zoro"
+TARGET_HAS_UDFPS := true
+WITH_GAPPS := true
 
-PRODUCT_NAME := lineage_malachite
+# Inherit some common Infinity X stuff.
+$(call inherit-product, vendor/infinity/config/common_full_phone.mk)
+
+PRODUCT_NAME := infinity_malachite
 PRODUCT_DEVICE := malachite
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := Redmi
@@ -30,3 +35,4 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     DeviceProduct=$(PRODUCT_SYSTEM_NAME)
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
+

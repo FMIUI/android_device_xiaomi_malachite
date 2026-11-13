@@ -262,3 +262,4 @@ BOARD_AVB_ODM_DLKM_ADD_HASHTREE_FOOTER_ARGS += --hash_algorithm sha256
 
 # Inherit the proprietary files
 include vendor/xiaomi/malachite/BoardConfigVendor.mk
+-include vendor/malachite-extras/BoardConfigExtras.mk

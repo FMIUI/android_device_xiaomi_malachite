@@ -550,3 +550,4 @@ PRODUCT_PACKAGES += \
 
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/malachite/malachite-vendor.mk)
+$(call inherit-product-if-exists, vendor/malachite-extras/malachite-extras.mk)

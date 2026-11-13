@@ -63,7 +63,7 @@ bluetooth.profile.sap.server.enabled=true
 # (audio_policy_configuration_a2dp_offload_disabled.xml).
 ro.bluetooth.a2dp_offload.supported=true
 persist.bluetooth.a2dp_offload.cap=sbc-aac
-persist.bluetooth.a2dp_offload.disabled=false
+persist.bluetooth.a2dp_offload.disabled=true
 
 # LE Audio: software LC3 by default, as stock. With hardware offload (the audio
 # DSP through the primary module's LE Audio ports, which stock never enables)

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lunaris_device_message">POCO X7 5G</string>
+    <string name="lunaris_processor_code_message">MediaTek Dimensity 7300 Ultra</string>
+    <string name="lunaris_battery_type_message">5500 mAh</string>
+    <string name="lunaris_screen_message">6.67-inch AMOLED 120Hz</string>
+</resources>

@@ -596,3 +596,12 @@ PRODUCT_COPY_FILES += \
 # fastbootd (Lineage added it itself; AOSPA doesn't)
 PRODUCT_PACKAGES += \
     fastbootd
+
+# DEBUG-ADB: only for userdebug/eng builds, user builds unaffected.
+# adb_keys is a local file (never committed): pre-authorizes the build machine's ADB key.
+ifneq ($(TARGET_BUILD_VARIANT),user)
+PRODUCT_SYSTEM_PROPERTIES += persist.sys.usb.config=adb
+ifneq ($(wildcard device/xiaomi/malachite/adb_keys),)
+PRODUCT_ADB_KEYS := device/xiaomi/malachite/adb_keys
+endif
+endif

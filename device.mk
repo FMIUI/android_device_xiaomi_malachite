@@ -605,3 +605,6 @@ ifneq ($(wildcard device/xiaomi/malachite/adb_keys),)
 PRODUCT_ADB_KEYS := device/xiaomi/malachite/adb_keys
 endif
 endif
+
+# AOSPA ships its own vendor.lineage.health (vendor/aospa/interfaces/health); don't scan Lineage's copy.
+PRODUCT_SOURCE_ROOT_DIRS += -hardware/lineage/interfaces/health

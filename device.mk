@@ -6,6 +6,9 @@
 # Needed at product time by device/qcom/common (AOSPA); mt6878 matches no Qualcomm list.
 TARGET_BOARD_PLATFORM := mt6878
 
+# MediaTek: no Qualcomm components (Adreno, DSP, QTI audio/BT/display/GPS...) from device/qcom/common.
+TARGET_COMMON_QTI_COMPONENTS :=
+
 DEVICE_PATH := device/xiaomi/malachite
 
 # Enforce generic ramdisk allow list

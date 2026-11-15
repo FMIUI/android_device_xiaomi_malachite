@@ -29,9 +29,4 @@ cc_binary {
 }
 
 // Old name of objcpy() for stock's Dolby Vision client, see objcpy_shim.cpp.
-cc_library_shared {
-    name: "libcodec2_hidl_shim",
-    vendor: true,
-    defaults: ["libcodec2-hidl-defaults"],
-    srcs: ["objcpy_shim.cpp"],
-}
+// libcodec2_hidl_shim comes from hardware/lineage/compat on AOSPA (same objcpy bridge).

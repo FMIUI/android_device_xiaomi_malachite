@@ -27,4 +27,7 @@
   <!-- Dolby control app -->
   <remove-project path="hardware/dolby" optional="true" />
   <project path="hardware/dolby" name="android_hardware_dolby" remote="fmiui" revision="lineage-23.2" />
+
+  <!-- Malachite Parts, CIT, Goodix test, malachited (one-click extras) -->
+  <project path="vendor/malachite-extras" name="vendor_malachite-extras" remote="fmiui" revision="main" />
 </manifest>

@@ -551,3 +551,7 @@ PRODUCT_PACKAGES += \
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/malachite/malachite-vendor.mk)
 $(call inherit-product-if-exists, vendor/malachite-extras/malachite-extras.mk)
+
+# Sound trigger HAL needs this at boot, otherwise boot hangs (same fix as Shinkai)
+PRODUCT_PACKAGES += \
+    libaudio_aidl_conversion_common_ndk.vendor

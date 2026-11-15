@@ -31,3 +31,8 @@ r_dir_file(hal_thermal_default, sysfs_powercap)
 r_dir_file(mi_thermald, sysfs_powercap)
 rw_dir_file(hal_fingerprint_default, sysfs_powercap)
 rw_dir_file(mtk_hal_camera, sysfs_powercap)
+
+# CLO wpa_supplicant also registers Qualcomm's vendor extension (vendor.qti.hardware.wifi.supplicant.ISupplicantVendor).
+# Unlabelled, servicemanager refuses it and the supplicant exits, so Wi-Fi never starts.
+type hal_wifi_supplicant_qti_service, hal_service_type, service_manager_type;
+hal_attribute_service(hal_wifi_supplicant, hal_wifi_supplicant_qti_service)

@@ -1,0 +1,6 @@
+# AOSPA's framework looks up Qualcomm services that don't exist on MediaTek (servicetracker, perfservice).
+# Give exactly those names their own label and silence the lookups; nothing else is hidden.
+type qti_absent_service, service_manager_type;
+type qti_absent_hwservice, hwservice_manager_type;
+dontaudit { system_server system_app platform_app priv_app } qti_absent_service:service_manager find;
+dontaudit system_server qti_absent_hwservice:hwservice_manager find;

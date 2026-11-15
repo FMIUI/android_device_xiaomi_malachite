@@ -58,4 +58,11 @@ cc_library_headers {
 BP
   echo '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.lineageos.settings.resources" />' > "$C/AndroidManifest.xml"
 fi
+# Android 17 platform policy labels /sys/class/powercap as sysfs_powercap (genfs labels 202604+).
+# MediaTek's vendor policy labels the same paths sysfs_therm; identical paths with two labels fail
+# precompiled_sepolicy. Where the platform labels them, drop MediaTek's two lines.
+G=device/mediatek/sepolicy_vndr/base/vendor/genfs_contexts
+if grep -qs "powercap" system/sepolicy/compat/plat_sepolicy_genfs_*.cil && grep -qs "^genfscon sysfs /class/powercap " "$G"; then
+  sed -i '/^genfscon sysfs \/class\/powercap /d; /^genfscon sysfs \/devices\/virtual\/powercap /d' "$G"
+fi
 exit 0

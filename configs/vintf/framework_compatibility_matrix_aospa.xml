@@ -1,0 +1,19 @@
+<!-- HALs in malachite's vendor manifest that LineageOS's framework matrix lists and AOSPA's doesn't. -->
+<compatibility-matrix version="1.0" type="framework">
+    <hal format="aidl">
+        <name>vendor.lineage.touch</name>
+        <version>1</version>
+        <interface>
+            <name>IHighTouchPollingRate</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.qti.hardware.wifi.supplicant</name>
+        <version>1</version>
+        <interface>
+            <name>ISupplicantVendor</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>

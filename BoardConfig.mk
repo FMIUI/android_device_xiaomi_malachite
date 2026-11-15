@@ -265,3 +265,6 @@ include vendor/xiaomi/malachite/BoardConfigVendor.mk
 
 # Android 17 core fixes for the malachite blobs (displayservice HIDL), re-applied on every build
 MALACHITE_CORE_PATCHED := $(shell bash device/xiaomi/malachite/patches/apply-core.sh)
+
+# AOSPA: framework matrix entries for HALs only Lineage's matrix lists
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += $(DEVICE_PATH)/configs/vintf/framework_compatibility_matrix_aospa.xml

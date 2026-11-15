@@ -12,3 +12,5 @@ vendor.xiaomi.sensor.citsensorservice.ICitSensorService/default u:object_r:vendo
 
 # NFC
 vendor.tms.tmsnfc_aidl.ITmsNfc/default u:object_r:vendor_tmsnfc_service:s0
+# vendor.lineage.touch HAL
+vendor.lineage.touch.IHighTouchPollingRate/default u:object_r:hal_lineage_touch_service:s0

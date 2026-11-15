@@ -1,0 +1,33 @@
+# Qualcomm-named sysfs labels used by AOSPA's vendor policy (vendor/aospa/sepolicy/vendor).
+# Declared so the policy compiles on MediaTek; label real nodes in genfs_contexts if a HAL needs them.
+type vendor_sysfs_battery_supply, sysfs_type, fs_type;
+type vendor_sysfs_usb_supply, sysfs_type, fs_type;
+
+# vendor.lineage.touch HAL: LineageOS declares these in device/lineage/sepolicy (common), which AOSPA doesn't use.
+hal_attribute(lineage_touch)
+type hal_lineage_touch_service, hal_service_type, protected_service, service_manager_type;
+hal_attribute_service(hal_lineage_touch, hal_lineage_touch_service)
+type hal_lineage_touch_default, domain;
+hal_server_domain(hal_lineage_touch_default, hal_lineage_touch)
+type hal_lineage_touch_default_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(hal_lineage_touch_default)
+binder_call(hal_lineage_touch_default, servicemanager)
+binder_call(hal_lineage_touch_client, hal_lineage_touch_server)
+
+# /sys/class/powercap is labelled sysfs_powercap by the Android 17 platform (MediaTek used sysfs_therm).
+# Same access MediaTek's vendor domains had through sysfs_therm:
+allow factory sysfs_powercap:dir search;
+allow factory sysfs_powercap:file rw_file_perms;
+allow hal_thermal_default sysfs_powercap:dir search;
+allow hal_thermal_default sysfs_powercap:file rw_file_perms;
+allow hal_thermal_default sysfs_powercap:file w_file_perms;
+allow init-thermal-logging-sh sysfs_powercap:dir r_dir_perms;
+allow init-thermal-logging-sh sysfs_powercap:file r_file_perms;
+allow merged_hal_service sysfs_powercap:dir search;
+allow merged_hal_service sysfs_powercap:file rw_file_perms;
+allow thermal_core sysfs_powercap:dir search;
+allow thermal_core sysfs_powercap:file rw_file_perms;
+r_dir_file(hal_thermal_default, sysfs_powercap)
+r_dir_file(mi_thermald, sysfs_powercap)
+rw_dir_file(hal_fingerprint_default, sysfs_powercap)
+rw_dir_file(mtk_hal_camera, sysfs_powercap)

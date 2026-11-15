@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# Needed at product time by device/qcom/common (AOSPA); mt6878 matches no Qualcomm list.
+TARGET_BOARD_PLATFORM := mt6878
+
 DEVICE_PATH := device/xiaomi/malachite
 
 # Enforce generic ramdisk allow list

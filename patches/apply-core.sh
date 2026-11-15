@@ -14,4 +14,16 @@ j = s.index("\n", i) + 1
 open(p, "w").write(s[:j] + line + "\n" + s[j:])
 PY
 fi
+# Android 17 forbids native_app_zygote from finding vendor services, but MediaTek's Mali rule grants it to all domains.
+Z=system/sepolicy/private/native_app_zygote.te
+if [ -f "$Z" ] && ! grep -q "malachite: mali" "$Z"; then
+python3 - "$Z" <<'PY2'
+import sys
+p = sys.argv[1]; s = open(p).read()
+old = "  -webviewupdate_service\n}:service_manager find;"
+new = "  -webviewupdate_service\n  -hal_service_type  # malachite: mali\n}:service_manager find;"
+if old not in s: sys.exit("malachite: native_app_zygote neverallow not found")
+open(p, "w").write(s.replace(old, new, 1))
+PY2
+fi
 exit 0

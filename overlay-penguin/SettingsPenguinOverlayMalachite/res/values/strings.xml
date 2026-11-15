@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shown in Settings > About phone > Maintainer -->
+    <string name="penguin_maintainer" translatable="false">Zoro</string>
+</resources>

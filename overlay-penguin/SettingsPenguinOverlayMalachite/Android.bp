@@ -1,0 +1,4 @@
+runtime_resource_overlay {
+    name: "SettingsPenguinOverlayMalachite",
+    product_specific: true,
+}

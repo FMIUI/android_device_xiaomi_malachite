@@ -623,3 +623,7 @@ PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/thermal-hal
 PRODUCT_SOURCE_ROOT_DIRS += -device/amlogic/yukawa
 PRODUCT_SOURCE_ROOT_DIRS += -hardware/qcom/bootctrl
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/common
+
+# PenguinOS: maintainer name in Settings > About phone
+PRODUCT_PACKAGES += \
+    SettingsPenguinOverlayMalachite

@@ -614,10 +614,12 @@ PRODUCT_SOURCE_ROOT_DIRS += -hardware/lineage/interfaces/health
 
 # QCOM-EXCLUDES: Qualcomm hardware repos in the CLO tree; malachite (MediaTek) installs nothing from them
 PRODUCT_SOURCE_ROOT_DIRS += -external/drm_hwcomposer
-PRODUCT_SOURCE_ROOT_DIRS += -external/tinycompress
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/data-ipa-cfg-mgr
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/data-ipa-cfg-mgr-legacy
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/dataservices
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/libvmmem
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/recovery-ext
 PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/opensource/thermal-hal
+PRODUCT_SOURCE_ROOT_DIRS += -device/amlogic/yukawa
+PRODUCT_SOURCE_ROOT_DIRS += -hardware/qcom/bootctrl
+PRODUCT_SOURCE_ROOT_DIRS += -vendor/qcom/common

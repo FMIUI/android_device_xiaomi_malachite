@@ -47,6 +47,14 @@ cc_library_headers {
     product_available: true,
     recovery_available: true,
 }
+
+// Qualcomm's kernel headers (CLO); MediaTek kernels have none. Users fall back to the standard UAPI headers.
+cc_library_headers {
+    name: "qti_kernel_headers",
+    vendor_available: true,
+    product_available: true,
+    recovery_available: true,
+}
 BP
   echo '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.lineageos.settings.resources" />' > "$C/AndroidManifest.xml"
 fi

@@ -99,3 +99,6 @@
 /data/vendor/dolby(/.*)? u:object_r:vendor_data_file:s0
 /vendor/bin/vendor\.charger_backlight\.malachite u:object_r:charger_backlight_exec:s0
 /vendor/bin/hw/android\.hardware\.media\.c2-dolby-service u:object_r:mediacodec_exec:s0
+
+# Power HAL (LineageOS labels it in device/lineage/sepolicy/common/vendor, not used on AOSPA)
+/(vendor|system/vendor)/bin/hw/android\.hardware\.power-service\.lineage-libperfmgr u:object_r:hal_power_default_exec:s0

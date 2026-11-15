@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Local manifest for POCO X7 (malachite) on Shinkai heptakaideka (Android 17).
+     Copy to .repo/local_manifests/malachite.xml, then repo sync. -->
+<manifest>
+  <remote name="fmiui" fetch="https://github.com/FMIUI" />
+  <remote name="malachite" fetch="https://github.com/malachite-project" />
+
+  <remove-project name="ShinkaiProject/android_packages_apps_DolbyAtmos" />
+
+  <project path="device/xiaomi/malachite" name="android_device_xiaomi_malachite" remote="fmiui" revision="lineage-24.0" />
+  <project path="vendor/xiaomi/malachite" name="proprietary_vendor_xiaomi_malachite" remote="fmiui" revision="lineage-24.0" />
+  <project path="vendor/malachite-extras" name="vendor_malachite-extras" remote="fmiui" revision="main" />
+  <project path="hardware/mediatek" name="android_hardware_mediatek" remote="fmiui" revision="lineage-24.0" />
+  <project path="hardware/dolby" name="android_hardware_dolby" remote="fmiui" revision="lineage-24.0" />
+  <project path="device/mediatek/sepolicy_vndr" name="android_device_mediatek_sepolicy_vndr" remote="fmiui" revision="lineage-24.0" />
+  <project path="vendor/mediatek/ims" name="android_vendor_mediatek_ims" remote="fmiui" revision="lineage-24.0" />
+  <project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="malachite" revision="lineage-24.0" />
+  <project path="device/xiaomi/malachite-kernel" name="android_device_xiaomi_malachite-kernel" remote="malachite" revision="lineage-24.0" />
+</manifest>

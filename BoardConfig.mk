@@ -262,3 +262,6 @@ BOARD_AVB_ODM_DLKM_ADD_HASHTREE_FOOTER_ARGS += --hash_algorithm sha256
 # Inherit the proprietary files
 include vendor/xiaomi/malachite/BoardConfigVendor.mk
 -include vendor/malachite-extras/BoardConfigExtras.mk
+
+# Android 17 core fixes for the malachite blobs (displayservice HIDL), re-applied on every build
+MALACHITE_CORE_PATCHED := $(shell bash device/xiaomi/malachite/patches/apply-core.sh)

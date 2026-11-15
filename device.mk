@@ -572,3 +572,18 @@ endif
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/malachite/malachite-vendor.mk)
 $(call inherit-product-if-exists, vendor/malachite-extras/malachite-extras.mk)
+
+
+# MTK blob dependencies (hwcomposer, audio HAL and others need libaedv)
+PRODUCT_PACKAGES += \
+    libaedv \
+    libaudio_aidl_conversion_common_ndk.vendor
+PRODUCT_SOONG_NAMESPACES += hardware/mediatek/libaedv
+
+# MTK IMS allowlist + config from the blobs (installed to /system next to ImsService)
+PRODUCT_PACKAGES += \
+    privapp-permissions-com.mediatek.ims.xml \
+    com.mediatek.ims.config.xml
+
+# OTA: point the updater at FMIUI/FMIUI-shinkai-ota
+PRODUCT_PACKAGES += UpdaterOverlayMalachite

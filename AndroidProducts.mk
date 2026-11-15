@@ -4,4 +4,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/shinkai_malachite.mk
+    $(LOCAL_DIR)/aospa_malachite.mk

@@ -585,5 +585,11 @@ PRODUCT_PACKAGES += \
     privapp-permissions-com.mediatek.ims.xml \
     com.mediatek.ims.config.xml
 
-# OTA: point the updater at FMIUI/FMIUI-shinkai-ota
-PRODUCT_PACKAGES += UpdaterOverlayMalachite
+
+# Kernel: Lineage's kernel task installed the prebuilt kernel; AOSPA doesn't, so do it here.
+PRODUCT_COPY_FILES += \
+    device/xiaomi/malachite-kernel/Image.lz4:kernel
+
+# fastbootd (Lineage added it itself; AOSPA doesn't)
+PRODUCT_PACKAGES += \
+    fastbootd

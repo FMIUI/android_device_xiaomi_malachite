@@ -10,10 +10,10 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from device makefile.
 $(call inherit-product, device/xiaomi/malachite/device.mk)
 
-# Inherit some common LineageOS stuff.
-$(call inherit-product, vendor/custom/config/common_full_phone.mk)
+# Inherit from the AOSPA (PenguinOS) configuration.
+$(call inherit-product, vendor/aospa/target/product/aospa-target.mk)
 
-PRODUCT_NAME := shinkai_malachite
+PRODUCT_NAME := aospa_malachite
 PRODUCT_DEVICE := malachite
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := Redmi
@@ -31,17 +31,5 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 
-# Shinkai
-SHINKAI_MAINTAINER := Zoro
-WITH_GMS := true
-
-# DEBUG-DEBUGGABLE: keep userdebug debuggable so adb works at boot
-ifneq ($(TARGET_BUILD_VARIANT),user)
-PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG := false
-endif
-
-# The PixelOS-based updater refuses to check without this
-PRODUCT_SYSTEM_PROPERTIES += net.pixelos.version=seventeen
-PRODUCT_SYSTEM_PROPERTIES += \
-    net.pixelos.build_type=UNOFFICIAL \
-    ro.custom.version=17
+# Boot animation resolution.
+TARGET_BOOT_ANIMATION_RES := 1080

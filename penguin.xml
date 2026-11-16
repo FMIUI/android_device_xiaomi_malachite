@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- POCO X7 / Redmi Note 14 Pro 5G (malachite) for PenguinOS celerity (Android 17, CLO/AOSPA).
      repo init -u https://github.com/Project-PenguinOS/manifest -b celerity --git-lfs
-     Save as .repo/local_manifests/malachite.xml, then repo sync. See README-CLO.md in the device tree. -->
+     Save as .repo/local_manifests/malachite.xml, then repo sync. See README.md on the clo branch. -->
 <manifest>
   <remote name="fmiui" fetch="https://github.com/FMIUI" />
   <remote name="lineage" fetch="https://github.com/LineageOS" />

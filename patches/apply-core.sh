@@ -65,4 +65,11 @@ G=device/mediatek/sepolicy_vndr/base/vendor/genfs_contexts
 if grep -qs "powercap" system/sepolicy/compat/plat_sepolicy_genfs_*.cil && grep -qs "^genfscon sysfs /class/powercap " "$G"; then
   sed -i '/^genfscon sysfs \/class\/powercap /d; /^genfscon sysfs \/devices\/virtual\/powercap /d' "$G"
 fi
+# AOSPA's recovery minui DRM backend is Qualcomm SDE-only; on MediaTek it brings the panel up (HBM)
+# but never draws. Use LineageOS's generic DRM backend instead when the SDE version is present.
+M=bootable/recovery/minui
+R=device/xiaomi/malachite/patches/recovery-minui
+if [ -f vendor/aospa/target/product/aospa-target.mk ] && { ! cmp -s $R/graphics_drm.cpp $M/graphics_drm.cpp || ! cmp -s $R/graphics_drm.h $M/graphics_drm.h; }; then
+  cp device/xiaomi/malachite/patches/recovery-minui/graphics_drm.cpp device/xiaomi/malachite/patches/recovery-minui/graphics_drm.h $M/
+fi
 exit 0

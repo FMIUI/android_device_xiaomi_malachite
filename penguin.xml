@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- POCO X7 / Redmi Note 14 Pro 5G (malachite) for PenguinOS celerity (Android 17, CLO/AOSPA).
+     repo init -u https://github.com/Project-PenguinOS/manifest -b celerity --git-lfs
+     Save as .repo/local_manifests/malachite.xml, then repo sync. See README-CLO.md in the device tree. -->
+<manifest>
+  <remote name="fmiui" fetch="https://github.com/FMIUI" />
+  <remote name="lineage" fetch="https://github.com/LineageOS" />
+  <remote name="malachite" fetch="https://github.com/malachite-project" />
+
+  <project path="device/xiaomi/malachite" name="android_device_xiaomi_malachite" remote="fmiui" revision="clo" />
+  <project path="vendor/xiaomi/malachite" name="proprietary_vendor_xiaomi_malachite" remote="fmiui" revision="lineage-24.0" />
+  <project path="vendor/malachite-extras" name="vendor_malachite-extras" remote="fmiui" revision="main" />
+  <project path="hardware/mediatek" name="android_hardware_mediatek" remote="fmiui" revision="lineage-24.0" />
+  <project path="hardware/dolby" name="android_hardware_dolby" remote="fmiui" revision="lineage-24.0" />
+  <project path="device/mediatek/sepolicy_vndr" name="android_device_mediatek_sepolicy_vndr" remote="fmiui" revision="lineage-24.0" />
+  <project path="vendor/mediatek/ims" name="android_vendor_mediatek_ims" remote="fmiui" revision="lineage-24.0" />
+  <project path="hardware/xiaomi" name="android_hardware_xiaomi" remote="malachite" revision="lineage-24.0" />
+  <project path="device/xiaomi/malachite-kernel" name="android_device_xiaomi_malachite-kernel" remote="malachite" revision="lineage-24.0" />
+  <!-- Lineage HAL interfaces: touch, power-libperfmgr, health -->
+  <project path="hardware/lineage/interfaces" name="android_hardware_lineage_interfaces" remote="lineage" revision="lineage-24.0" />
+  <project path="hardware/google/pixel" name="android_hardware_google_pixel" remote="lineage" revision="lineage-24.0" />
+  <project path="device/lineage/sepolicy" name="android_device_lineage_sepolicy" remote="lineage" revision="lineage-24.0" />
+  <project path="packages/apps/EuiccPolicy" name="android_packages_apps_EuiccPolicy" remote="lineage" revision="lineage-24.0" />
+</manifest>
